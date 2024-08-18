@@ -13,5 +13,7 @@ UCLASS()
 class FROZENFLAMESANCTUM_API AFFS_HeroCharacter : public AFFS_CharacterBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	AFFS_HeroCharacter();
 };
