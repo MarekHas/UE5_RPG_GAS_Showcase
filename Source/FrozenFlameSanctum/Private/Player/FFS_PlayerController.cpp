@@ -4,10 +4,18 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Interfaces/MarkableInterface.h"
 
 AFFS_PlayerController::AFFS_PlayerController()
 {
 	bReplicates = true;
+}
+
+void AFFS_PlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+
+	MarkActorUnderCursor();
 }
 
 void AFFS_PlayerController::BeginPlay()
@@ -60,5 +68,38 @@ void AFFS_PlayerController::OnMovementInputAction(const FInputActionValue& Input
 	{
 		ControlledPawn->AddMovementInput(Forward, InputActionVector2D.Y);
 		ControlledPawn->AddMovementInput(Right, InputActionVector2D.X);
+	}
+}
+
+void AFFS_PlayerController::MarkActorUnderCursor()
+{
+	FHitResult CursorHit;
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	if (!CursorHit.bBlockingHit) return;
+
+	LastMarkedActor = CurrentMarkedActor;
+	CurrentMarkedActor = CursorHit.GetActor();
+
+	/*  What actor is under cursor 
+	 *  1. LastActor is null && CurrentActor is null - no mark
+	 *	2. LastActor is null && CurrentActor is valid - Mark Current Actor
+	 *	3. LastActor is valid && CurrentActor is null - Unmark LastMarkedActor
+	 *  4. Both actors are valid, and are the same actor - no mark
+	 *	5. Both actors are valid, but LastActor != CurrentActor - Unmark LastActor, and Mark CurrentActor
+	 */
+
+	//Case 1
+	if (LastMarkedActor == nullptr && CurrentMarkedActor == nullptr) return;
+	//Case 2
+	if (LastMarkedActor == nullptr && CurrentMarkedActor) { CurrentMarkedActor->MarkActor(); }
+	//Case 3
+	if (LastMarkedActor && CurrentMarkedActor == nullptr) { LastMarkedActor->UnmarkActor(); }
+	//Case 4
+	if (LastMarkedActor && CurrentMarkedActor && LastMarkedActor == CurrentMarkedActor) return;
+	//Case 5
+	if (LastMarkedActor && CurrentMarkedActor && LastMarkedActor != CurrentMarkedActor) 
+	{
+		LastMarkedActor->UnmarkActor();
+		CurrentMarkedActor->MarkActor();
 	}
 }

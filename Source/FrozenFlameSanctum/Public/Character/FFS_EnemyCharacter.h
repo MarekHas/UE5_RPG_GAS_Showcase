@@ -3,15 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "Character/FFS_CharacterBase.h"
+#include "Interfaces/MarkableInterface.h"
+
 #include "FFS_EnemyCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FROZENFLAMESANCTUM_API AFFS_EnemyCharacter : public AFFS_CharacterBase
+class FROZENFLAMESANCTUM_API AFFS_EnemyCharacter : public AFFS_CharacterBase, public IMarkableInterface
 {
 	GENERATED_BODY()
 	
+public:
+	AFFS_EnemyCharacter();
+
+	// Inherited via IMarkableInterface
+	void MarkActor() override;
+
+	void UnmarkActor() override;
+
 };

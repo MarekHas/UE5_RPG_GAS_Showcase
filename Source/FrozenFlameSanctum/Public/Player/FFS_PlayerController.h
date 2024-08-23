@@ -10,7 +10,7 @@
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
-
+class IMarkableInterface;
 /**
  * 
  */
@@ -21,7 +21,8 @@ class FROZENFLAMESANCTUM_API AFFS_PlayerController : public APlayerController
 
 public:
 	AFFS_PlayerController();
-
+	
+	virtual void PlayerTick(float DeltaTime) override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -32,8 +33,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MovementAction;
 	
+	TScriptInterface<IMarkableInterface> LastMarkedActor;
+	TScriptInterface<IMarkableInterface> CurrentMarkedActor;
+	
 	void AddMappingContext();
 	void MouseCursorSettings();
-
+	
 	void OnMovementInputAction(const FInputActionValue& InputActionValue);
+
+	void MarkActorUnderCursor();
 };
