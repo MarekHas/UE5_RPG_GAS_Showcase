@@ -20,9 +20,13 @@ class FROZENFLAMESANCTUM_API AFFS_EnemyCharacter : public AFFS_CharacterBase, pu
 public:
 	AFFS_EnemyCharacter();
 
-	// Inherited via IMarkableInterface
+	// Begin IMarkableInterface
 	void MarkActor() override;
-
 	void UnmarkActor() override;
+	// end IMarkableInterface
 
+protected:
+	virtual void BeginPlay() override;
+private:
+	void SetupAbilitySystemComponent();
 };

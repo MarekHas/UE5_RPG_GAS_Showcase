@@ -16,4 +16,15 @@ class FROZENFLAMESANCTUM_API AFFS_HeroCharacter : public AFFS_CharacterBase
 
 public:
 	AFFS_HeroCharacter();
+
+	/**APawn
+	 * Called when this Pawn is possessed. Only called on the server (or in standalone).
+	 * @param NewController The controller possessing this pawn
+	 */
+	virtual void PossessedBy(AController* NewController) override;
+	/** APawn 
+	* PlayerState Replication Notification Callback*/
+	virtual void OnRep_PlayerState() override;
+private:
+	void InitAbilityActorInfo();
 };

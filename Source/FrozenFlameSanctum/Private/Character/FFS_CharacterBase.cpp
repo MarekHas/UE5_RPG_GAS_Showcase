@@ -14,6 +14,11 @@ AFFS_CharacterBase::AFFS_CharacterBase()
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+UAbilitySystemComponent* AFFS_CharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 // Called when the game starts or when spawned
 void AFFS_CharacterBase::BeginPlay()
 {
