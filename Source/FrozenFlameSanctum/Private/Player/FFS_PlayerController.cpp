@@ -40,8 +40,11 @@ void AFFS_PlayerController::SetupInputComponent()
 void AFFS_PlayerController::AddMappingContext()
 {
 	UEnhancedInputLocalPlayerSubsystem* InputLocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(InputLocalPlayerSubsystem);
-	InputLocalPlayerSubsystem->AddMappingContext(PlayerContext, 0);
+
+	if (InputLocalPlayerSubsystem) 
+	{
+		InputLocalPlayerSubsystem->AddMappingContext(PlayerContext, 0);
+	}
 }
 
 void AFFS_PlayerController::MouseCursorSettings()

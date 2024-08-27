@@ -6,6 +6,8 @@
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/FFS_PlayerState.h"
+#include "Player/FFS_PlayerController.h"
+#include "UI/HUD/FFS_GameHUD.h"
 
 AFFS_HeroCharacter::AFFS_HeroCharacter()
 {
@@ -41,4 +43,13 @@ void AFFS_HeroCharacter::InitAbilityActorInfo()
 	FFS_PlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(FFS_PlayerState, this);
 	AbilitySystemComponent = FFS_PlayerState->GetAbilitySystemComponent();
 	AttributeSet = FFS_PlayerState->GetAttributeSet();
+	
+	//Init HUD Widget - only for valid PlayerController 
+	if (AFFS_PlayerController* FFS_PlayerController = Cast<AFFS_PlayerController>(GetController()))
+	{
+		if (AFFS_GameHUD* GameHUD = Cast<AFFS_GameHUD>(FFS_PlayerController->GetHUD()))
+		{
+			GameHUD->InitWidget(FFS_PlayerController, FFS_PlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }
