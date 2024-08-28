@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "FFS_EffectActor.generated.h"
 
+class UGameplayEffect;
+
 UCLASS()
 class FROZENFLAMESANCTUM_API AFFS_EffectActor : public AActor
 {
@@ -18,4 +20,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable)
+	void ApplyEffectToActor(TSubclassOf<UGameplayEffect> GameplayEffectClass, AActor* AffectedActor);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
+	TSubclassOf<UGameplayEffect> InstantGameplayEffectClass;
 };

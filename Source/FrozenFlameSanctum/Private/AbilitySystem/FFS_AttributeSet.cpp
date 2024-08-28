@@ -6,9 +6,9 @@
 
 UFFS_AttributeSet::UFFS_AttributeSet()
 {
-	InitHealth(75.f);
+	InitHealth(50.f);
 	InitMaxHealth(100.f);
-	InitMana(25.f);
+	InitMana(30.f);
 	InitMaxMana(50.f);
 }
 
