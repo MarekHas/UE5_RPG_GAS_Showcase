@@ -28,10 +28,7 @@ struct FNotificationWidgetRow : public FTableRowBase
 
 class UFFS_UserWidget;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float, NewHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedSignature, float, NewMaxHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChangedSignature, float, NewMana);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxManaChangedSignature, float, NewMaxMana);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatsChangedSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationSignature, FNotificationWidgetRow, Notification);
 
 /**
@@ -47,16 +44,16 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
-	FOnHealthChangedSignature OnHealthChangedDelegate;
+	FOnPlayerStatsChangedSignature OnHealthChangedDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
-	FOnMaxHealthChangedSignature OnMaxHealthChangedDelegate;
+	FOnPlayerStatsChangedSignature OnMaxHealthChangedDelegate;
 	
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
-	FOnManaChangedSignature OnManaChangedDelegate;
+	FOnPlayerStatsChangedSignature OnManaChangedDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
-	FOnMaxManaChangedSignature OnMaxManaChangedDelegate;
+	FOnPlayerStatsChangedSignature OnMaxManaChangedDelegate;
 	
 	UPROPERTY(BlueprintAssignable, Category = "Notifications")
 	FOnNotificationSignature OnNotificationDelegate;
@@ -64,11 +61,6 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Notifications")
 	TObjectPtr<UDataTable> NotificationWidgetsDataTable;
-
-	void OnHealthChanged(const FOnAttributeChangeData& Data) const;
-	void OnMaxHealthChanged(const FOnAttributeChangeData& Data) const;
-	void OnManaChanged(const FOnAttributeChangeData& Data) const;
-	void OnMaxManaChanged(const FOnAttributeChangeData& Data) const;
 
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);

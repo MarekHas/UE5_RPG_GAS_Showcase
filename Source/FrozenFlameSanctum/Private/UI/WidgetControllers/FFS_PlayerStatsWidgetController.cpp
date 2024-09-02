@@ -19,18 +19,20 @@ void UFFS_PlayerStatsWidgetController::BindCallbacksToDependencies()
 {
 	const UFFS_AttributeSet* FFS_AttributeSet = CastChecked<UFFS_AttributeSet>(AttributeSet);
 
+	//Player Stats delegates
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		FFS_AttributeSet->GetHealthAttribute()).AddUObject(this, &UFFS_PlayerStatsWidgetController::OnHealthChanged);
+		FFS_AttributeSet->GetHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnHealthChangedDelegate.Broadcast(Data.NewValue); });
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		FFS_AttributeSet->GetMaxHealthAttribute()).AddUObject(this, &UFFS_PlayerStatsWidgetController::OnMaxHealthChanged);
+		FFS_AttributeSet->GetMaxHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnMaxHealthChangedDelegate.Broadcast(Data.NewValue); });
 	
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		FFS_AttributeSet->GetManaAttribute()).AddUObject(this, &UFFS_PlayerStatsWidgetController::OnManaChanged);
+		FFS_AttributeSet->GetManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnManaChangedDelegate.Broadcast(Data.NewValue); });
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		FFS_AttributeSet->GetMaxManaAttribute()).AddUObject(this, &UFFS_PlayerStatsWidgetController::OnMaxManaChanged);
+		FFS_AttributeSet->GetMaxManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnMaxManaChangedDelegate.Broadcast(Data.NewValue); });
 
+	//Notification about effect applied delegate
 	Cast<UFFS_AbilitySystemComponent>(AbilitySystemComponent)->OnEffectAppliedDelegate.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 		{
@@ -56,24 +58,4 @@ void UFFS_PlayerStatsWidgetController::BindCallbacksToDependencies()
 			}
 		}
 	);
-}
-
-void UFFS_PlayerStatsWidgetController::OnHealthChanged(const FOnAttributeChangeData& Data) const
-{
-	OnHealthChangedDelegate.Broadcast(Data.NewValue);
-}
-
-void UFFS_PlayerStatsWidgetController::OnMaxHealthChanged(const FOnAttributeChangeData& Data) const
-{
-	OnMaxHealthChangedDelegate.Broadcast(Data.NewValue);
-}
-
-void UFFS_PlayerStatsWidgetController::OnManaChanged(const FOnAttributeChangeData& Data) const
-{
-	OnManaChangedDelegate.Broadcast(Data.NewValue);
-}
-
-void UFFS_PlayerStatsWidgetController::OnMaxManaChanged(const FOnAttributeChangeData& Data) const
-{
-	OnMaxManaChangedDelegate.Broadcast(Data.NewValue);
 }
