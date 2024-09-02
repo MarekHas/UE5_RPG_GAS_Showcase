@@ -5,6 +5,8 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+
+#include "AbilitySystem/FFS_AbilitySystemComponent.h"
 #include "Player/FFS_PlayerState.h"
 #include "Player/FFS_PlayerController.h"
 #include "UI/HUD/FFS_GameHUD.h"
@@ -41,6 +43,8 @@ void AFFS_HeroCharacter::InitAbilityActorInfo()
 	check(FFS_PlayerState);
 
 	FFS_PlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(FFS_PlayerState, this);
+	//Bind to AbilitySystemComponent delegate after AbilityActorInfo has been set 
+	Cast<UFFS_AbilitySystemComponent>(FFS_PlayerState->GetAbilitySystemComponent())->BindToAbilitySystemDelegates();
 	AbilitySystemComponent = FFS_PlayerState->GetAbilitySystemComponent();
 	AttributeSet = FFS_PlayerState->GetAttributeSet();
 	

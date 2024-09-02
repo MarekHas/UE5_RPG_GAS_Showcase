@@ -25,3 +25,7 @@ void AFFS_CharacterBase::BeginPlay()
 	Super::BeginPlay();
 	
 }
+
+void AFFS_CharacterBase::InitAbilityActorInfo()
+{
+}

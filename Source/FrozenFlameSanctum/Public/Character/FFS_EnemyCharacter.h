@@ -27,6 +27,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	//~Begin AFFS_CharacterBase override
+	virtual void InitAbilityActorInfo() override;
+	//~End  AFFS_CharacterBase override
 private:
 	void SetupAbilitySystemComponent();
 };

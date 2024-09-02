@@ -26,5 +26,7 @@ public:
 	* PlayerState Replication Notification Callback*/
 	virtual void OnRep_PlayerState() override;
 private:
-	void InitAbilityActorInfo();
+	//~Begin AFFS_CharacterBase override
+	virtual void InitAbilityActorInfo() override;
+	//~End AFFS_CharacterBase override
 };

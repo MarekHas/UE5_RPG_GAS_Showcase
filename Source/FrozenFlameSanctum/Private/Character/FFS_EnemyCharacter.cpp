@@ -22,6 +22,12 @@ void AFFS_EnemyCharacter::BeginPlay()
 	AbilitySystemComponent->InitAbilityActorInfo(this,this);
 }
 
+void AFFS_EnemyCharacter::InitAbilityActorInfo()
+{
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	Cast<UFFS_AbilitySystemComponent>(AbilitySystemComponent)->BindToAbilitySystemDelegates();
+}
+
 void AFFS_EnemyCharacter::SetupAbilitySystemComponent()
 {
 	AbilitySystemComponent = CreateDefaultSubobject<UFFS_AbilitySystemComponent>("AbilitySystemComponent");
