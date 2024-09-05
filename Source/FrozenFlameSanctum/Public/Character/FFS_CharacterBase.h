@@ -9,6 +9,7 @@
 
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UGameplayEffect;
 
 UCLASS(Abstract)
 class FROZENFLAMESANCTUM_API AFFS_CharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -39,5 +40,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> InitialCharacterStats;
+
 	virtual void InitAbilityActorInfo();
+	void InitCharacterStats() const;
 };

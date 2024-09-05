@@ -96,6 +96,27 @@ public:
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(UFFS_AttributeSet, MaxMana);
 
+	//
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Strength, Category = "Character stats Attributes")
+	FGameplayAttributeData Strength;
+	ATTRIBUTE_ACCESSORS(UFFS_AttributeSet, Strength);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Dexterity, Category = "Character stats Attributes")
+	FGameplayAttributeData Dexterity;
+	ATTRIBUTE_ACCESSORS(UFFS_AttributeSet, Dexterity);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Intelligence, Category = "Character stats Attributes")
+	FGameplayAttributeData Intelligence;
+	ATTRIBUTE_ACCESSORS(UFFS_AttributeSet, Intelligence);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Resistance, Category = "Character stats Attributes")
+	FGameplayAttributeData Resistance;
+	ATTRIBUTE_ACCESSORS(UFFS_AttributeSet, Resistance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Vitality, Category = "Character stats Attributes")
+	FGameplayAttributeData Vitality;
+	ATTRIBUTE_ACCESSORS(UFFS_AttributeSet, Vitality);
+
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
 
@@ -107,6 +128,21 @@ public:
 
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
+
+	//Character stats Attributes
+	UFUNCTION()
+	void OnRep_Strength(const FGameplayAttributeData& OldStrength) const;
+	UFUNCTION()
+	void OnRep_Dexterity(const FGameplayAttributeData& OldDexterity) const;
+
+	UFUNCTION()
+	void OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const;
+
+	UFUNCTION()
+	void OnRep_Resistance(const FGameplayAttributeData& OldResistance) const;
+
+	UFUNCTION()
+	void OnRep_Vitality(const FGameplayAttributeData& OldVitality) const;
 
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProperties) const;

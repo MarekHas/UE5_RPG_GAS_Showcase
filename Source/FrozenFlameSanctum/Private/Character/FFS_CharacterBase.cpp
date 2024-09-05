@@ -2,6 +2,7 @@
 
 
 #include "Character/FFS_CharacterBase.h"
+#include "AbilitySystemComponent.h"
 
 // Sets default values
 AFFS_CharacterBase::AFFS_CharacterBase()
@@ -28,4 +29,14 @@ void AFFS_CharacterBase::BeginPlay()
 
 void AFFS_CharacterBase::InitAbilityActorInfo()
 {
+}
+
+void AFFS_CharacterBase::InitCharacterStats() const
+{
+	check(IsValid(GetAbilitySystemComponent()));
+	check(InitialCharacterStats);
+
+	const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(InitialCharacterStats, 1.f, ContextHandle);
+	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
 }

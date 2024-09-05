@@ -23,6 +23,12 @@ void UFFS_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Strength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Dexterity, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Intelligence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Resistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Vitality, COND_None, REPNOTIFY_Always);
 }
 
 void UFFS_AttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
@@ -43,6 +49,31 @@ void UFFS_AttributeSet::OnRep_Mana(const FGameplayAttributeData& OldMana) const
 void UFFS_AttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, MaxMana, OldMaxMana);
+}
+
+void UFFS_AttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, Strength, OldStrength);
+}
+
+void UFFS_AttributeSet::OnRep_Dexterity(const FGameplayAttributeData& OldDexterity) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, Dexterity, OldDexterity);
+}
+
+void UFFS_AttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, Intelligence, OldIntelligence);
+}
+
+void UFFS_AttributeSet::OnRep_Resistance(const FGameplayAttributeData& OldResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, Resistance, OldResistance);
+}
+
+void UFFS_AttributeSet::OnRep_Vitality(const FGameplayAttributeData& OldVitality) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, Vitality, OldVitality);
 }
 
 void UFFS_AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)

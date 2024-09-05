@@ -29,4 +29,7 @@ private:
 	//~Begin AFFS_CharacterBase override
 	virtual void InitAbilityActorInfo() override;
 	//~End AFFS_CharacterBase override
+	// 
+	//Add HUD Widget for valid player controller
+	void InitHUDWidget();
 };

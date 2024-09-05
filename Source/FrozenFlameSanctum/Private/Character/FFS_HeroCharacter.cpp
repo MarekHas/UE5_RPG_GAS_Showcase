@@ -29,12 +29,17 @@ void AFFS_HeroCharacter::PossessedBy(AController* NewController)
 
 	// Init for the Server
 	InitAbilityActorInfo();
+	//Character stats only initialize on server values will be replicated to client
+	InitCharacterStats();
+	InitHUDWidget();
 }
 
 void AFFS_HeroCharacter::OnRep_PlayerState()
 {
 	// Init for the Client
 	InitAbilityActorInfo();
+	InitCharacterStats();
+	InitHUDWidget();
 }
 
 void AFFS_HeroCharacter::InitAbilityActorInfo()
@@ -47,7 +52,12 @@ void AFFS_HeroCharacter::InitAbilityActorInfo()
 	Cast<UFFS_AbilitySystemComponent>(FFS_PlayerState->GetAbilitySystemComponent())->BindToAbilitySystemDelegates();
 	AbilitySystemComponent = FFS_PlayerState->GetAbilitySystemComponent();
 	AttributeSet = FFS_PlayerState->GetAttributeSet();
-	
+}
+
+void AFFS_HeroCharacter::InitHUDWidget()
+{
+	AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
+	check(FFS_PlayerState);
 	//Init HUD Widget - only for valid PlayerController 
 	if (AFFS_PlayerController* FFS_PlayerController = Cast<AFFS_PlayerController>(GetController()))
 	{
