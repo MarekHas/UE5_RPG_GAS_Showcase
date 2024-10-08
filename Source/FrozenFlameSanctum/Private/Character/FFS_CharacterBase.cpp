@@ -31,12 +31,18 @@ void AFFS_CharacterBase::InitAbilityActorInfo()
 {
 }
 
-void AFFS_CharacterBase::InitCharacterStats() const
+void AFFS_CharacterBase::InitDefaultStats()
+{
+	InitStatsFromEffect(InitialCharacterStats, 1.f);
+	InitStatsFromEffect(InitialDerivedStats, 1.f);
+}
+
+void AFFS_CharacterBase::InitStatsFromEffect(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
 {
 	check(IsValid(GetAbilitySystemComponent()));
-	check(InitialCharacterStats);
+	check(GameplayEffectClass);
 
 	const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
-	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(InitialCharacterStats, 1.f, ContextHandle);
+	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
 }

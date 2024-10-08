@@ -10,9 +10,7 @@
 UFFS_AttributeSet::UFFS_AttributeSet()
 {
 	InitHealth(50.f);
-	InitMaxHealth(100.f);
 	InitMana(30.f);
-	InitMaxMana(50.f);
 }
 
 void UFFS_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

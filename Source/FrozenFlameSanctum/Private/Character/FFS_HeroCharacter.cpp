@@ -30,7 +30,7 @@ void AFFS_HeroCharacter::PossessedBy(AController* NewController)
 	// Init for the Server
 	InitAbilityActorInfo();
 	//Character stats only initialize on server values will be replicated to client
-	InitCharacterStats();
+	InitDefaultStats();
 	InitHUDWidget();
 }
 
@@ -38,7 +38,7 @@ void AFFS_HeroCharacter::OnRep_PlayerState()
 {
 	// Init for the Client
 	InitAbilityActorInfo();
-	InitCharacterStats();
+	InitDefaultStats();
 	InitHUDWidget();
 }
 

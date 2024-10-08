@@ -42,7 +42,12 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> InitialCharacterStats;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> InitialDerivedStats;
+
 
 	virtual void InitAbilityActorInfo();
-	void InitCharacterStats() const;
+
+	void InitDefaultStats();
+	void InitStatsFromEffect(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
 };
