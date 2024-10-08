@@ -42,6 +42,14 @@ void AFFS_HeroCharacter::OnRep_PlayerState()
 	InitHUDWidget();
 }
 
+int32 AFFS_HeroCharacter::GetPlayerLevel()
+{
+	const AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
+	check(FFS_PlayerState);
+
+	return FFS_PlayerState->GetPlayerLevel();
+}
+
 void AFFS_HeroCharacter::InitAbilityActorInfo()
 {
 	AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();

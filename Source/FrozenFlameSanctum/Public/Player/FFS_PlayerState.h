@@ -18,12 +18,13 @@ class FROZENFLAMESANCTUM_API AFFS_PlayerState : public APlayerState, public IAbi
 	GENERATED_BODY()
 public:
 	AFFS_PlayerState();
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	//~ Begin IAbilitySystemInterface Interface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	//~ End IAbilitySystemInterface Interface
 
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
 protected:
 
 	UPROPERTY()
@@ -33,5 +34,10 @@ protected:
 	TObjectPtr<UAttributeSet> AttributeSet;
 
 private:
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Level)
+	int32 Level = 1;
+
+	UFUNCTION()
+	void OnRep_Level(int32 OldLevel);
 	void SetupAbilitySystemComponent();
 };

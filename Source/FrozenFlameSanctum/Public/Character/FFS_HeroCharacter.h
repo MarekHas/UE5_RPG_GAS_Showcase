@@ -25,6 +25,9 @@ public:
 	/** APawn 
 	* PlayerState Replication Notification Callback*/
 	virtual void OnRep_PlayerState() override;
+	/** Combat Interface */
+	virtual int32 GetPlayerLevel() override;
+	/** end Combat Interface */
 private:
 	//~Begin AFFS_CharacterBase override
 	virtual void InitAbilityActorInfo() override;

@@ -47,4 +47,9 @@ void AFFS_EnemyCharacter::UnmarkActor()
 	GetMesh()->SetCustomDepthStencilValue(0);
 }
 
+int32 AFFS_EnemyCharacter::GetPlayerLevel()
+{
+	return Level;
+}
+
 

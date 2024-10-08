@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/CombatInterface.h"
+
 #include "FFS_CharacterBase.generated.h"
 
 class UAbilitySystemComponent;
@@ -12,7 +15,7 @@ class UAttributeSet;
 class UGameplayEffect;
 
 UCLASS(Abstract)
-class FROZENFLAMESANCTUM_API AFFS_CharacterBase : public ACharacter, public IAbilitySystemInterface
+class FROZENFLAMESANCTUM_API AFFS_CharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 

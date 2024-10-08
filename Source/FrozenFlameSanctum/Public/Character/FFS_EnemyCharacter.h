@@ -24,12 +24,18 @@ public:
 	void MarkActor() override;
 	void UnmarkActor() override;
 	// end IMarkableInterface
-
+	
+	/** Combat Interface */
+	virtual int32 GetPlayerLevel() override;
+	/** end Combat Interface */
 protected:
 	virtual void BeginPlay() override;
 	//~Begin AFFS_CharacterBase override
 	virtual void InitAbilityActorInfo() override;
 	//~End  AFFS_CharacterBase override
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy stats")
+	int32 Level = 1;
 private:
 	void SetupAbilitySystemComponent();
 };
