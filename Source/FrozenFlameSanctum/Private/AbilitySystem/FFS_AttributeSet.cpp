@@ -20,15 +20,24 @@ void UFFS_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Mana, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Strength, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Dexterity, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Intelligence, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Resistance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Vitality, COND_None, REPNOTIFY_Always);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, ArmorPenetration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, BlockChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, CriticalHitChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, CriticalHitDamage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, CriticalHitResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, HealthRegeneration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, ManaRegeneration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 }
 
 void UFFS_AttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
@@ -36,19 +45,9 @@ void UFFS_AttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) co
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, Health, OldHealth);
 }
 
-void UFFS_AttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, MaxHealth, OldMaxHealth);
-}
-
 void UFFS_AttributeSet::OnRep_Mana(const FGameplayAttributeData& OldMana) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, Mana, OldMana);
-}
-
-void UFFS_AttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, MaxMana, OldMaxMana);
 }
 
 void UFFS_AttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
@@ -74,6 +73,55 @@ void UFFS_AttributeSet::OnRep_Resistance(const FGameplayAttributeData& OldResist
 void UFFS_AttributeSet::OnRep_Vitality(const FGameplayAttributeData& OldVitality) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, Vitality, OldVitality);
+}
+
+void UFFS_AttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, Armor, OldArmor);
+}
+
+void UFFS_AttributeSet::OnRep_ArmorPenetration(const FGameplayAttributeData& OldArmorPenetration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, ArmorPenetration, OldArmorPenetration);
+}
+
+void UFFS_AttributeSet::OnRep_BlockChance(const FGameplayAttributeData& OldBlockChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, BlockChance, OldBlockChance);
+}
+
+void UFFS_AttributeSet::OnRep_CriticalHitChance(const FGameplayAttributeData& OldCriticalHitChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, CriticalHitChance, OldCriticalHitChance);
+}
+
+void UFFS_AttributeSet::OnRep_CriticalHitDamage(const FGameplayAttributeData& OldCriticalHitDamage) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, CriticalHitDamage, OldCriticalHitDamage);
+}
+
+void UFFS_AttributeSet::OnRep_CriticalHitResistance(const FGameplayAttributeData& OldCriticalHitResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, CriticalHitResistance, OldCriticalHitResistance);
+}
+
+void UFFS_AttributeSet::OnRep_HealthRegeneration(const FGameplayAttributeData& OldHealthRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, HealthRegeneration, OldHealthRegeneration);
+}
+
+void UFFS_AttributeSet::OnRep_ManaRegeneration(const FGameplayAttributeData& OldManaRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, ManaRegeneration, OldManaRegeneration);
+}
+
+void UFFS_AttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, MaxMana, OldMaxMana);
+}
+void UFFS_AttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, MaxHealth, OldMaxHealth);
 }
 
 void UFFS_AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
