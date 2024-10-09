@@ -44,7 +44,9 @@ protected:
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
-	TSubclassOf<UGameplayEffect> InitialCharacterStats;
+	TSubclassOf<UGameplayEffect> InitialLiveStats;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> InitialBaseStats;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> InitialDerivedStats;
 
