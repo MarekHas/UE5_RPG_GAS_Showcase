@@ -8,6 +8,7 @@
 #include "FFS_AbilityBlueprintLibrary.generated.h"
 
 class UFFS_PlayerStatsWidgetController;
+class UFFS_AttributesWidgetController;
 /**
  * 
  */
@@ -18,4 +19,7 @@ class FROZENFLAMESANCTUM_API UFFS_AbilityBlueprintLibrary : public UBlueprintFun
 public:
 	UFUNCTION(BlueprintPure, Category = "AbilityBlueprintFunctionLibrary|WidgetController")
 	static UFFS_PlayerStatsWidgetController* GetWidgetController(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category = "AbilityBlueprintFunctionLibrary|WidgetController")
+	static UFFS_AttributesWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
 };

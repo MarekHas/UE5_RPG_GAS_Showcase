@@ -10,7 +10,7 @@ class UAbilitySystemComponent;
 class UAttributeSet;
 class UFFS_UserWidget;
 class UFFS_PlayerStatsWidgetController;
-
+class UFFS_AttributesWidgetController;
 struct FWidgetControllerParams;
 
 /**
@@ -23,6 +23,8 @@ class FROZENFLAMESANCTUM_API AFFS_GameHUD : public AHUD
 
 public:
 	UFFS_PlayerStatsWidgetController* GetWidgetControllerParams(const FWidgetControllerParams& WidgetControllerParams);
+	UFFS_AttributesWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams);
+
 	void InitWidget(APlayerController* InController, APlayerState* InState, UAbilitySystemComponent* InAbilitySystem, UAttributeSet* InAttribute);
 
 private:
@@ -35,4 +37,9 @@ private:
 	TObjectPtr<UFFS_UserWidget>  MainCanvas;
 	UPROPERTY()
 	TObjectPtr<UFFS_PlayerStatsWidgetController> PlayerStatsWidgetController;
+
+	UPROPERTY()
+	TObjectPtr<UFFS_AttributesWidgetController> AttributeMenuWidgetController;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UFFS_AttributesWidgetController> AttributeMenuWidgetControllerClass;
 };

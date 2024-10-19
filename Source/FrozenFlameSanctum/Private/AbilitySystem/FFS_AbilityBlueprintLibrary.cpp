@@ -25,3 +25,20 @@ UFFS_PlayerStatsWidgetController* UFFS_AbilityBlueprintLibrary::GetWidgetControl
 	}
 	return nullptr;
 }
+
+UFFS_AttributesWidgetController* UFFS_AbilityBlueprintLibrary::GetAttributeMenuWidgetController(const UObject* WorldContextObject)
+{
+	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	{
+		if (AFFS_GameHUD* GameHUD = Cast<AFFS_GameHUD>(PlayerController->GetHUD()))
+		{
+			AFFS_PlayerState* PlayerState = PlayerController->GetPlayerState<AFFS_PlayerState>();
+			UAbilitySystemComponent* AbilitySystem = PlayerState->GetAbilitySystemComponent();
+			UAttributeSet* Attributes = PlayerState->GetAttributeSet();
+			const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState, AbilitySystem, Attributes);
+
+			return GameHUD->GetAttributeMenuWidgetController(WidgetControllerParams);
+		}
+	}
+	return nullptr;
+}

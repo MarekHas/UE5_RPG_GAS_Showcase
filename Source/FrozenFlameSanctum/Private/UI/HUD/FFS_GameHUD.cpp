@@ -4,6 +4,7 @@
 
 #include "UI/Widgets/FFS_UserWidget.h"
 #include "UI/WidgetControllers/FFS_PlayerStatsWidgetController.h"
+#include "UI/WidgetControllers/FFS_AttributesWidgetController.h"
 
 UFFS_PlayerStatsWidgetController* AFFS_GameHUD::GetWidgetControllerParams(const FWidgetControllerParams& WidgetControllerParams)
 {
@@ -15,6 +16,18 @@ UFFS_PlayerStatsWidgetController* AFFS_GameHUD::GetWidgetControllerParams(const 
 		return PlayerStatsWidgetController;
 	}
 	return PlayerStatsWidgetController;
+}
+
+UFFS_AttributesWidgetController* AFFS_GameHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeMenuWidgetController == nullptr)
+	{
+		AttributeMenuWidgetController = NewObject<UFFS_AttributesWidgetController>(this, AttributeMenuWidgetControllerClass);
+		
+		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+		AttributeMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return AttributeMenuWidgetController;
 }
 
 void AFFS_GameHUD::InitWidget(APlayerController* InController, APlayerState* InState, UAbilitySystemComponent* InAbilitySystem, UAttributeSet* InAttribute)

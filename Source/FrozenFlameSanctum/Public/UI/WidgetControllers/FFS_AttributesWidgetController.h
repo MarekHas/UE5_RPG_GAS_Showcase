@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class FROZENFLAMESANCTUM_API UFFS_AttributesWidgetController : public UFFS_WidgetController
 {
 	GENERATED_BODY()
