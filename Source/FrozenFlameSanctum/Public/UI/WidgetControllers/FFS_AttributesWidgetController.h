@@ -6,6 +6,10 @@
 #include "UI/WidgetControllers/FFS_WidgetController.h"
 #include "FFS_AttributesWidgetController.generated.h"
 
+class UAttributeInfo;
+struct FFFS_AttributeInfo;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeInfoSignature, const struct FFFS_AttributeInfo&, Info);
 /**
  * 
  */
@@ -18,4 +22,12 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 	virtual void BroadcastInitialValues() override;
 	
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
+	FAttributeInfoSignature AttributeInfoDelegate;
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UAttributeInfo> AttributeInfo;
+
+private:
+	void BroadcastAttributeInfo(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute) const;
 };
