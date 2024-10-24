@@ -31,6 +31,7 @@ void AFFS_HeroCharacter::PossessedBy(AController* NewController)
 	InitAbilityActorInfo();
 	//Character stats only initialize on server values will be replicated to client
 	InitDefaultStats();
+	AddCharacterAbilities();
 	InitHUDWidget();
 }
 

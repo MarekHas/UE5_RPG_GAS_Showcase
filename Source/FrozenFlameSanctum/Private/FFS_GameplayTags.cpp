@@ -73,4 +73,33 @@ void FFFS_GameplayTags::InitializeNativeGameplayTags()
 		FName("Attribute.Secondary.CriticalHitResistance"),
 		FString("Reduce chance to get critical damage")
 	);
+
+	/*
+ * Input Tags
+ */
+
+	GameplayTags.Input_Left_Mouse_Button = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.LeftMouseButton"),
+		FString("Input Tag for Left Mouse Button")
+	);
+	GameplayTags.Input_Right_Mouse_Button = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.RightMouseButton"),
+		FString("Input Tag for Right Mouse Button")
+	);
+	GameplayTags.Input_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.1"),
+		FString("Input Tag for 1 key")
+	);
+	GameplayTags.Input_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.2"),
+		FString("Input Tag for 2 key")
+	);
+	GameplayTags.Input_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.3"),
+		FString("Input Tag for 3 key")
+	);
+	GameplayTags.Input_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.4"),
+		FString("Input Tag for 4 key")
+	);
 }

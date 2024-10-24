@@ -3,7 +3,7 @@
 
 #include "Character/FFS_CharacterBase.h"
 #include "AbilitySystemComponent.h"
-
+#include "AbilitySystem/FFS_AbilitySystemComponent.h"
 // Sets default values
 AFFS_CharacterBase::AFFS_CharacterBase()
 {
@@ -49,4 +49,12 @@ void AFFS_CharacterBase::InitStatsFromEffect(TSubclassOf<UGameplayEffect> Gamepl
 
 	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
+}
+
+void AFFS_CharacterBase::AddCharacterAbilities()
+{
+	UFFS_AbilitySystemComponent* FFS_AbilitySystemComponent = CastChecked<UFFS_AbilitySystemComponent>(AbilitySystemComponent);
+	if (!HasAuthority()) return;
+
+	FFS_AbilitySystemComponent->AddCharacterAbilities(StartupAbilities);
 }

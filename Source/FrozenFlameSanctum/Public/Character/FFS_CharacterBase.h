@@ -13,6 +13,7 @@
 class UAbilitySystemComponent;
 class UAttributeSet;
 class UGameplayEffect;
+class UGameplayAbility;
 
 UCLASS(Abstract)
 class FROZENFLAMESANCTUM_API AFFS_CharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -55,4 +56,9 @@ protected:
 
 	void InitDefaultStats();
 	void InitStatsFromEffect(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
+	void AddCharacterAbilities();
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };

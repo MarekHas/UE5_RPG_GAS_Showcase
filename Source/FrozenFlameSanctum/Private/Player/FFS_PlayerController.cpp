@@ -2,20 +2,23 @@
 
 #include "Player/FFS_PlayerController.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
+#include "Components/SplineComponent.h"
+
 #include "Interfaces/MarkableInterface.h"
+#include "Input/FFS_InputComponent.h"
+#include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
+#include "AbilitySystem/FFS_AbilitySystemComponent.h"
+#include "FFS_GameplayTags.h"
 
 AFFS_PlayerController::AFFS_PlayerController()
 {
 	bReplicates = true;
-}
-
-void AFFS_PlayerController::PlayerTick(float DeltaTime)
-{
-	Super::PlayerTick(DeltaTime);
-
-	MarkActorUnderCursor();
+	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
 }
 
 void AFFS_PlayerController::BeginPlay()
@@ -27,21 +30,19 @@ void AFFS_PlayerController::BeginPlay()
 	MouseCursorSettings();
 }
 
-void AFFS_PlayerController::SetupInputComponent()
+void AFFS_PlayerController::PlayerTick(float DeltaTime)
 {
-	Super::SetupInputComponent();
+	Super::PlayerTick(DeltaTime);
 
-
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-
-	EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &AFFS_PlayerController::OnMovementInputAction);
+	MarkActorUnderCursor();
+	AutoRun();
 }
 
 void AFFS_PlayerController::AddMappingContext()
 {
 	UEnhancedInputLocalPlayerSubsystem* InputLocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 
-	if (InputLocalPlayerSubsystem) 
+	if (InputLocalPlayerSubsystem)
 	{
 		InputLocalPlayerSubsystem->AddMappingContext(PlayerContext, 0);
 	}
@@ -57,6 +58,56 @@ void AFFS_PlayerController::MouseCursorSettings()
 	InputModeData.SetHideCursorDuringCapture(false);
 	SetInputMode(InputModeData);
 }
+
+void AFFS_PlayerController::AutoRun()
+{
+	if (!bAutoRunning) return;
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+		const FVector Direction = Spline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
+		ControlledPawn->AddMovementInput(Direction);
+		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
+		if (DistanceToDestination <= AutoRunAcceptanceRadius)
+		{
+			bAutoRunning = false;
+		}
+	}
+}
+
+void AFFS_PlayerController::MarkActorUnderCursor()
+{
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	if (!CursorHit.bBlockingHit) return;
+
+	LastMarkedActor = CurrentMarkedActor;
+	CurrentMarkedActor = CursorHit.GetActor();
+
+	if (CurrentMarkedActor != LastMarkedActor)
+	{
+		if (CurrentMarkedActor) 
+		{
+			CurrentMarkedActor->MarkActor();
+		}
+		if (LastMarkedActor) 
+		{
+			LastMarkedActor->UnmarkActor();
+		} 
+	}
+}
+
+void AFFS_PlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+
+	UFFS_InputComponent* FFS_InputComponent = CastChecked<UFFS_InputComponent>(InputComponent);
+
+	FFS_InputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &AFFS_PlayerController::OnMovementInputAction);
+	FFS_InputComponent->BindAbilityActions(InputSettings, this, &ThisClass::InputTagPressed, &ThisClass::InputTagReleased, &ThisClass::InputTagHeld);
+}
+
+
 
 void AFFS_PlayerController::OnMovementInputAction(const FInputActionValue& InputActionValue)
 {
@@ -74,35 +125,94 @@ void AFFS_PlayerController::OnMovementInputAction(const FInputActionValue& Input
 	}
 }
 
-void AFFS_PlayerController::MarkActorUnderCursor()
+void AFFS_PlayerController::InputTagPressed(FGameplayTag InputTag)
 {
-	FHitResult CursorHit;
-	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
-	if (!CursorHit.bBlockingHit) return;
-
-	LastMarkedActor = CurrentMarkedActor;
-	CurrentMarkedActor = CursorHit.GetActor();
-
-	/*  What actor is under cursor 
-	 *  1. LastActor is null && CurrentActor is null - no mark
-	 *	2. LastActor is null && CurrentActor is valid - Mark Current Actor
-	 *	3. LastActor is valid && CurrentActor is null - Unmark LastMarkedActor
-	 *  4. Both actors are valid, and are the same actor - no mark
-	 *	5. Both actors are valid, but LastActor != CurrentActor - Unmark LastActor, and Mark CurrentActor
-	 */
-
-	//Case 1
-	if (LastMarkedActor == nullptr && CurrentMarkedActor == nullptr) return;
-	//Case 2
-	if (LastMarkedActor == nullptr && CurrentMarkedActor) { CurrentMarkedActor->MarkActor(); }
-	//Case 3
-	if (LastMarkedActor && CurrentMarkedActor == nullptr) { LastMarkedActor->UnmarkActor(); }
-	//Case 4
-	if (LastMarkedActor && CurrentMarkedActor && LastMarkedActor == CurrentMarkedActor) return;
-	//Case 5
-	if (LastMarkedActor && CurrentMarkedActor && LastMarkedActor != CurrentMarkedActor) 
+	if (InputTag.MatchesTagExact(FFFS_GameplayTags::Get().Input_Left_Mouse_Button))
 	{
-		LastMarkedActor->UnmarkActor();
-		CurrentMarkedActor->MarkActor();
+		bTargeting = CurrentMarkedActor ? true : false;
+		bAutoRunning = false;
 	}
+}
+
+void AFFS_PlayerController::InputTagReleased(FGameplayTag InputTag)
+{
+	if (!InputTag.MatchesTagExact(FFFS_GameplayTags::Get().Input_Left_Mouse_Button))
+	{
+		if (GetAbilitySystemComponent())
+		{
+			GetAbilitySystemComponent()->AbilityInputTagReleased(InputTag);
+		}
+		return;
+	}
+
+	if (bTargeting)
+	{
+		if (GetAbilitySystemComponent())
+		{
+			GetAbilitySystemComponent()->AbilityInputTagHeld(InputTag);
+		}
+	}
+	else
+	{
+		const APawn* ControlledPawn = GetPawn();
+		if (FollowTime <= ShortPressThreshold && ControlledPawn)
+		{
+			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
+			{
+				Spline->ClearSplinePoints();
+				for (const FVector& PointLoc : NavPath->PathPoints)
+				{
+					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
+					DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Green, false, 5.f);
+				}
+
+				CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+				bAutoRunning = true;
+			}
+		}
+		FollowTime = 0.f;
+		bTargeting = false;
+	}
+}
+
+void AFFS_PlayerController::InputTagHeld(FGameplayTag InputTag)
+{
+	if (!InputTag.MatchesTagExact(FFFS_GameplayTags::Get().Input_Left_Mouse_Button))
+	{
+		if (GetAbilitySystemComponent())
+		{
+			GetAbilitySystemComponent()->AbilityInputTagHeld(InputTag);
+		}
+		return;
+	}
+	if (bTargeting)
+	{
+		if (GetAbilitySystemComponent())
+		{
+			GetAbilitySystemComponent()->AbilityInputTagHeld(InputTag);
+		}
+	}
+	else
+	{
+		FollowTime += GetWorld()->GetDeltaSeconds();
+
+		if (CursorHit.bBlockingHit)
+		{
+			CachedDestination = CursorHit.ImpactPoint;
+		}
+		if (APawn* ControlledPawn = GetPawn())
+		{
+			const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+			ControlledPawn->AddMovementInput(WorldDirection);
+		}
+	}
+}
+
+UFFS_AbilitySystemComponent* AFFS_PlayerController::GetAbilitySystemComponent()
+{
+	if (AbilitySystemComponent == nullptr)
+	{
+		AbilitySystemComponent = Cast<UFFS_AbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return AbilitySystemComponent;
 }

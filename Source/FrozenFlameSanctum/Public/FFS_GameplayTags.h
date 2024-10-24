@@ -32,6 +32,13 @@ public:
 	FGameplayTag Attribute_Secondary_CriticalHitDamage;
 	FGameplayTag Attribute_Secondary_CriticalHitResistance;
 
+	FGameplayTag Input_Left_Mouse_Button;
+	FGameplayTag Input_Right_Mouse_Button;
+	FGameplayTag Input_1;
+	FGameplayTag Input_2;
+	FGameplayTag Input_3;
+	FGameplayTag Input_4;
+
 protected:
 private:
 	static FFFS_GameplayTags GameplayTags;

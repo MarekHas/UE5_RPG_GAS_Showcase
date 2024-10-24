@@ -19,6 +19,12 @@ public:
 	//This function should be called affter InitAbilityActorInfo 
 	void BindToAbilitySystemDelegates();
 	FOnEffectAppliedSignature OnEffectAppliedDelegate;
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
+
+	void AbilityInputTagHeld(const FGameplayTag& InputTag);
+	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 protected:
-	void OnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
+	UFUNCTION(Client, Reliable)
+	void Client_OnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
+
 };
