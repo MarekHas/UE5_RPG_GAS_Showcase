@@ -105,6 +105,8 @@ void AFFS_PlayerController::SetupInputComponent()
 
 	FFS_InputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &AFFS_PlayerController::OnMovementInputAction);
 	FFS_InputComponent->BindAbilityActions(InputSettings, this, &ThisClass::InputTagPressed, &ThisClass::InputTagReleased, &ThisClass::InputTagHeld);
+	FFS_InputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AFFS_PlayerController::ShiftPressed);
+	FFS_InputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AFFS_PlayerController::ShiftReleased);
 }
 
 
@@ -144,15 +146,12 @@ void AFFS_PlayerController::InputTagReleased(FGameplayTag InputTag)
 		}
 		return;
 	}
-
-	if (bTargeting)
+	if (GetAbilitySystemComponent())
 	{
-		if (GetAbilitySystemComponent())
-		{
-			GetAbilitySystemComponent()->AbilityInputTagHeld(InputTag);
-		}
+		GetAbilitySystemComponent()->AbilityInputTagHeld(InputTag);
 	}
-	else
+
+	if (!bTargeting && !bShiftKeyDown)
 	{
 		const APawn* ControlledPawn = GetPawn();
 		if (FollowTime <= ShortPressThreshold && ControlledPawn)
@@ -185,7 +184,7 @@ void AFFS_PlayerController::InputTagHeld(FGameplayTag InputTag)
 		}
 		return;
 	}
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetAbilitySystemComponent())
 		{

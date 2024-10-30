@@ -4,10 +4,11 @@
 #include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "UI/WidgetControllers/FFS_WidgetController.h"
+#include "Game/FFS_GameModeBase.h"
 #include "Player/FFS_PlayerState.h"
-#include "UI/WidgetControllers/FFS_PlayerStatsWidgetController.h"
 #include "UI/HUD/FFS_GameHUD.h"
+#include "UI/WidgetControllers/FFS_WidgetController.h"
+#include "UI/WidgetControllers/FFS_PlayerStatsWidgetController.h"
 
 UFFS_PlayerStatsWidgetController* UFFS_AbilityBlueprintLibrary::GetWidgetController(const UObject* WorldContextObject)
 {
@@ -41,4 +42,28 @@ UFFS_AttributesWidgetController* UFFS_AbilityBlueprintLibrary::GetAttributeMenuW
 		}
 	}
 	return nullptr;
+}
+
+void UFFS_AbilityBlueprintLibrary::InitializeDefaultAttributes(const UObject* WorldContextObject, EEnemyType EnemyType, float Level, UAbilitySystemComponent* AbilitySystemComponent)
+{
+	AFFS_GameModeBase* AuraGameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (AuraGameMode == nullptr) return;
+
+	AActor* AvatarActor = AbilitySystemComponent->GetAvatarActor();
+	UEnemiesData* EnemiesData = AuraGameMode->EnemiesData;
+	FEnemyDefaultStats EnemyStats = EnemiesData->GetClassDefaultInfo(EnemyType);
+	
+	FGameplayEffectContextHandle PrimaryAttributesContextHandle = AbilitySystemComponent->MakeEffectContext();
+	PrimaryAttributesContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle PrimaryAttributesSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(EnemyStats.PrimaryAttributes, Level, PrimaryAttributesContextHandle);
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*PrimaryAttributesSpecHandle.Data.Get());
+	FGameplayEffectContextHandle SecondaryAttributesContextHandle = AbilitySystemComponent->MakeEffectContext();
+	SecondaryAttributesContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle SecondaryAttributesSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(EnemiesData->SecondaryAttributes, Level, SecondaryAttributesContextHandle);
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SecondaryAttributesSpecHandle.Data.Get());
+	FGameplayEffectContextHandle VitalAttributesContextHandle = AbilitySystemComponent->MakeEffectContext();
+	VitalAttributesContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(EnemiesData->VitalAttributes, Level, VitalAttributesContextHandle);
+	
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }

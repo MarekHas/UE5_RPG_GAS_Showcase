@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "FFS_GameModeBase.generated.h"
 
+class UEnemiesData;
+
 /**
  * 
  */
@@ -14,4 +16,7 @@ class FROZENFLAMESANCTUM_API AFFS_GameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Enemy data")
+	TObjectPtr<UEnemiesData> EnemiesData;
 };

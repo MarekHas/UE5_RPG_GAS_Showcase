@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "AbilitySystem/Data/EnemiesData.h"
 
 #include "FFS_AbilityBlueprintLibrary.generated.h"
 
@@ -22,4 +23,8 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "AbilityBlueprintFunctionLibrary|WidgetController")
 	static UFFS_AttributesWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|EnemyType")
+	static void InitializeDefaultAttributes(const UObject* WorldContextObject, EEnemyType EnemyType, 
+		float Level, UAbilitySystemComponent* AbilitySystemComponent);
 };

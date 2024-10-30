@@ -38,6 +38,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MovementAction;
 	
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ShiftAction;
+	void ShiftPressed() { bShiftKeyDown = true; };
+	void ShiftReleased() { bShiftKeyDown = false; };
+	bool bShiftKeyDown = false;
+
 	TScriptInterface<IMarkableInterface> LastMarkedActor;
 	TScriptInterface<IMarkableInterface> CurrentMarkedActor;
 	FHitResult CursorHit;

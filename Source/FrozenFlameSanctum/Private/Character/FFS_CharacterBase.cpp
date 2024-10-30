@@ -2,13 +2,25 @@
 
 
 #include "Character/FFS_CharacterBase.h"
+
 #include "AbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
+
 #include "AbilitySystem/FFS_AbilitySystemComponent.h"
+#include "FrozenFlameSanctum/FrozenFlameSanctum.h"
+
 // Sets default values
 AFFS_CharacterBase::AFFS_CharacterBase()
 {
  	// Set this character to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_ProjectileSpell, ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
 
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), FName("RightHandSocket"));
@@ -27,11 +39,17 @@ void AFFS_CharacterBase::BeginPlay()
 	
 }
 
+FVector AFFS_CharacterBase::GetCombatSocketLocation()
+{
+	check(GetMesh());
+	return GetMesh()->GetSocketLocation(WeaponTipSocketName);
+}
+
 void AFFS_CharacterBase::InitAbilityActorInfo()
 {
 }
 
-void AFFS_CharacterBase::InitDefaultStats()
+void AFFS_CharacterBase::InitDefaultStats() const
 {
 	InitStatsFromEffect(InitialBaseStats, 1.f);
 	InitStatsFromEffect(InitialDerivedStats, 1.f);

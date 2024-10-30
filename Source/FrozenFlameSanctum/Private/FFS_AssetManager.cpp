@@ -3,6 +3,7 @@
 
 #include "FFS_AssetManager.h"
 #include "FFS_GameplayTags.h"
+#include "AbilitySystemGlobals.h"
 
 UFFS_AssetManager& UFFS_AssetManager::Get()
 {
@@ -16,4 +17,6 @@ void UFFS_AssetManager::StartInitialLoading()
 {
 	Super::StartInitialLoading();
 	FFFS_GameplayTags::InitializeNativeGameplayTags();
+	// This is required to use Target Data!
+	UAbilitySystemGlobals::Get().InitGlobalData();
 }
