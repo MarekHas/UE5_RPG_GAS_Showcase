@@ -7,6 +7,8 @@
 #include "EnemiesData.generated.h"
 
 class UGameplayEffect;
+class UGameplayAbility;
+
 UENUM(BlueprintType)
 enum class EEnemyType : uint8
 {
@@ -19,7 +21,7 @@ USTRUCT(BlueprintType)
 struct FEnemyDefaultStats
 {
 	GENERATED_BODY()
-	UPROPERTY(EditDefaultsOnly, Category = "Enemy Default Stats")
+	UPROPERTY(EditDefaultsOnly, Category = "EnemyData")
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
 };
 
@@ -32,12 +34,16 @@ class FROZENFLAMESANCTUM_API UEnemiesData : public UDataAsset
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "Enemy")
+	UPROPERTY(EditDefaultsOnly, Category = "EnemyData")
 	TMap<EEnemyType, FEnemyDefaultStats> EnemyInfo;
-	UPROPERTY(EditDefaultsOnly, Category = "Enemy")
+	UPROPERTY(EditDefaultsOnly, Category = "EnemyData")
 	TSubclassOf<UGameplayEffect> SecondaryAttributes;
-	UPROPERTY(EditDefaultsOnly, Category = "Enemy")
+	UPROPERTY(EditDefaultsOnly, Category = "EnemyData")
 	TSubclassOf<UGameplayEffect> VitalAttributes;
+	UPROPERTY(EditDefaultsOnly, Category = "EnemyData")
+	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
+	UPROPERTY(EditDefaultsOnly, Category = "EnemyData|Damage")
+	TObjectPtr<UCurveTable> DamageCalculationCoefficients;
 
 	FEnemyDefaultStats GetClassDefaultInfo(EEnemyType EnemyType);
 };

@@ -9,6 +9,7 @@
 #include "UI/HUD/FFS_GameHUD.h"
 #include "UI/WidgetControllers/FFS_WidgetController.h"
 #include "UI/WidgetControllers/FFS_PlayerStatsWidgetController.h"
+#include "AbilitySystem/Data/EnemiesData.h"
 
 UFFS_PlayerStatsWidgetController* UFFS_AbilityBlueprintLibrary::GetWidgetController(const UObject* WorldContextObject)
 {
@@ -46,11 +47,11 @@ UFFS_AttributesWidgetController* UFFS_AbilityBlueprintLibrary::GetAttributeMenuW
 
 void UFFS_AbilityBlueprintLibrary::InitializeDefaultAttributes(const UObject* WorldContextObject, EEnemyType EnemyType, float Level, UAbilitySystemComponent* AbilitySystemComponent)
 {
-	AFFS_GameModeBase* AuraGameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (AuraGameMode == nullptr) return;
+	AFFS_GameModeBase* FFS_GameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (FFS_GameMode == nullptr) return;
 
 	AActor* AvatarActor = AbilitySystemComponent->GetAvatarActor();
-	UEnemiesData* EnemiesData = AuraGameMode->EnemiesData;
+	UEnemiesData* EnemiesData = GetCharacterClassInfo(WorldContextObject);
 	FEnemyDefaultStats EnemyStats = EnemiesData->GetClassDefaultInfo(EnemyType);
 	
 	FGameplayEffectContextHandle PrimaryAttributesContextHandle = AbilitySystemComponent->MakeEffectContext();
@@ -66,4 +67,24 @@ void UFFS_AbilityBlueprintLibrary::InitializeDefaultAttributes(const UObject* Wo
 	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(EnemiesData->VitalAttributes, Level, VitalAttributesContextHandle);
 	
 	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
+}
+
+void UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent)
+{
+	AFFS_GameModeBase* FFS_GameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (FFS_GameMode == nullptr) return;
+	
+	UEnemiesData* EnemiesData = GetCharacterClassInfo(WorldContextObject);
+	for (TSubclassOf<UGameplayAbility> AbilityClass : EnemiesData->CommonAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		AbilitySystemComponent->GiveAbility(AbilitySpec);
+	}
+}
+
+UEnemiesData* UFFS_AbilityBlueprintLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
+{
+	AFFS_GameModeBase* FFS_GameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (FFS_GameMode == nullptr) return nullptr;
+	return FFS_GameMode->EnemiesData;
 }

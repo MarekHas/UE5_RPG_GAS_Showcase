@@ -1,11 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "Character/FFS_EnemyCharacter.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Components/WidgetComponent.h"
+
 #include "AbilitySystem/FFS_AbilitySystemComponent.h"
 #include "AbilitySystem/FFS_AttributeSet.h"
-#include "Components/WidgetComponent.h"
 #include "UI/Widgets/FFS_UserWidget.h"
 #include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
+#include "FFS_GameplayTags.h"
 
 AFFS_EnemyCharacter::AFFS_EnemyCharacter()
 {
@@ -20,13 +23,25 @@ AFFS_EnemyCharacter::AFFS_EnemyCharacter()
 	HealthBar->SetupAttachment(GetRootComponent());
 }
 
+void AFFS_EnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+}
+
 void AFFS_EnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	check(AbilitySystemComponent);
-	AbilitySystemComponent->InitAbilityActorInfo(this,this);
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 
+	check(AbilitySystemComponent);
+	InitAbilityActorInfo();
+
+	if (HasAuthority()) 
+	{
+		UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	}
+	
 	if (UFFS_UserWidget* FFS_UserWidget = Cast<UFFS_UserWidget>(HealthBar->GetUserWidgetObject()))
 	{
 		FFS_UserWidget->SetWidgetController(this);
@@ -46,6 +61,12 @@ void AFFS_EnemyCharacter::BeginPlay()
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
+		
+		AbilitySystemComponent->RegisterGameplayTagEvent(FFFS_GameplayTags::Get().HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+			this,
+			&AFFS_EnemyCharacter::HitReactTagChanged
+		);
+
 		OnHealthChanged.Broadcast(FFS_AttributeSet->GetHealth());
 		OnMaxHealthChanged.Broadcast(FFS_AttributeSet->GetMaxHealth());
 	}
@@ -62,6 +83,7 @@ void AFFS_EnemyCharacter::InitAbilityActorInfo()
 void AFFS_EnemyCharacter::InitDefaultStats() const
 {
 	UFFS_AbilityBlueprintLibrary::InitializeDefaultAttributes(this, EnemyType, Level, AbilitySystemComponent);
+	UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 }
 
 void AFFS_EnemyCharacter::SetupAbilitySystemComponent()
@@ -86,6 +108,12 @@ void AFFS_EnemyCharacter::UnmarkActor()
 int32 AFFS_EnemyCharacter::GetPlayerLevel()
 {
 	return Level;
+}
+
+void AFFS_EnemyCharacter::Death()
+{
+	SetLifeSpan(LifeTime);
+	Super::Death();
 }
 
 

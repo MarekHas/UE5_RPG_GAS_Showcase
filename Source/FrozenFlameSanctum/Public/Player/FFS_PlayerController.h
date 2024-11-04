@@ -16,6 +16,7 @@ class IMarkableInterface;
 class UFFS_InputSettings;
 class UFFS_AbilitySystemComponent;
 class USplineComponent;
+class USpatialTextWidgetComponent;
 /**
  * 
  */
@@ -28,6 +29,8 @@ public:
 	AFFS_PlayerController();
 	
 	virtual void PlayerTick(float DeltaTime) override;
+	UFUNCTION(Client, Reliable)
+	void ShowDamageValue(float DamageAmount, ACharacter* TargetCharacter);
 protected:
 	virtual void BeginPlay() override;
 
@@ -74,4 +77,7 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> Spline;
 	void AutoRun();
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<USpatialTextWidgetComponent> DamageTextComponentClass;
 };

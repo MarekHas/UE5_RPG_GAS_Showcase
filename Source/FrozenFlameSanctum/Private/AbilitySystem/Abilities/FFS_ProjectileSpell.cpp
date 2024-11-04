@@ -8,7 +8,7 @@
 #include "Interfaces/CombatInterface.h"
 
 #include "Effects/FFS_Projectile.h"
-
+#include "FFS_GameplayTags.h"
 
 void UFFS_ProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -42,6 +42,12 @@ void UFFS_ProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 			
 			const UAbilitySystemComponent* SourceAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 			const FGameplayEffectSpecHandle SpecHandle = SourceAbilitySystemComponent->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceAbilitySystemComponent->MakeEffectContext());
+			
+			const FFFS_GameplayTags GameplayTags = FFFS_GameplayTags::Get();
+			const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
+			
 			Projectile->DamageEffectSpecHandle = SpecHandle;
 
 			Projectile->FinishSpawning(SpawnTransform);

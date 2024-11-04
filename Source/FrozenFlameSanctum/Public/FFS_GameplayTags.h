@@ -39,6 +39,8 @@ public:
 	FGameplayTag Input_3;
 	FGameplayTag Input_4;
 
+	FGameplayTag Damage;
+	FGameplayTag HitReact;
 protected:
 private:
 	static FFFS_GameplayTags GameplayTags;

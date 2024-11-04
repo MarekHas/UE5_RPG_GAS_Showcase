@@ -14,6 +14,8 @@
 #include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
 #include "AbilitySystem/FFS_AbilitySystemComponent.h"
 #include "FFS_GameplayTags.h"
+#include "UI/Widgets/SpatialTextWidgetComponent.h"
+#include "GameFramework/Character.h"
 
 AFFS_PlayerController::AFFS_PlayerController()
 {
@@ -36,6 +38,18 @@ void AFFS_PlayerController::PlayerTick(float DeltaTime)
 
 	MarkActorUnderCursor();
 	AutoRun();
+}
+
+void AFFS_PlayerController::ShowDamageValue_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+{
+	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	{
+		USpatialTextWidgetComponent* DamageText = NewObject<USpatialTextWidgetComponent>(TargetCharacter, DamageTextComponentClass);
+		DamageText->RegisterComponent();
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageText->SetDamageText(DamageAmount);
+	}
 }
 
 void AFFS_PlayerController::AddMappingContext()

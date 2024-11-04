@@ -158,7 +158,12 @@ public:
 	ATTRIBUTE_ACCESSORS(UFFS_AttributeSet, CriticalHitResistance);
 
 #pragma endregion
-
+	/*
+	 * Meta Attributes
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(UFFS_AttributeSet, IncomingDamage);
 #pragma region Basic stats Rep Notifay
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
@@ -207,4 +212,5 @@ public:
 
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProperties) const;
+	void ShowDamageText(const FEffectProperties& Props, float Damage) const;
 };

@@ -2,11 +2,15 @@
 
 
 #include "AbilitySystem/FFS_AttributeSet.h"
+
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/Character.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 #include "FFS_GameplayTags.h"
+#include "Interfaces/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/FFS_PlayerController.h"
 
 UFFS_AttributeSet::UFFS_AttributeSet()
 {
@@ -169,6 +173,33 @@ void UFFS_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
 	}
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		const float LocalIncomingDamage = GetIncomingDamage();
+		SetIncomingDamage(0.f);
+		if (LocalIncomingDamage > 0.f)
+		{
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+			const bool bIsDead = NewHealth <= 0.f;
+
+			if (bIsDead)
+			{
+				ICombatInterface* CombatInterface = Cast<ICombatInterface>(EffectProperties.TargetAvatarActor);
+				if (CombatInterface)
+				{
+					CombatInterface->Death();
+				}
+			}
+			else
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FFFS_GameplayTags::Get().HitReact);
+				EffectProperties.TargetAbilitySystem->TryActivateAbilitiesByTag(TagContainer);
+			}
+			ShowDamageText(EffectProperties, LocalIncomingDamage);
+		}
+	}
 }
 
 void UFFS_AttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProperties) const
@@ -189,7 +220,7 @@ void UFFS_AttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		}
 		if (EffectProperties.SourceController)
 		{
-			ACharacter* SourceCharacter = Cast<ACharacter>(EffectProperties.SourceController->GetPawn());
+			EffectProperties.SourceCharacter = Cast<ACharacter>(EffectProperties.SourceController->GetPawn());
 		}
 	}
 
@@ -199,5 +230,16 @@ void UFFS_AttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		EffectProperties.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		EffectProperties.TargetCharacter = Cast<ACharacter>(EffectProperties.TargetAvatarActor);
 		EffectProperties.TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(EffectProperties.TargetAvatarActor);
+	}
+}
+
+void UFFS_AttributeSet::ShowDamageText(const FEffectProperties& Props, float Damage) const
+{
+	if (Props.SourceCharacter != Props.TargetCharacter)
+	{
+		if (AFFS_PlayerController* PlayerController = Cast<AFFS_PlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
+		{
+			PlayerController->ShowDamageValue(Damage, Props.TargetCharacter);
+		}
 	}
 }
