@@ -11,6 +11,8 @@
 
 #include "FFS_EnemyCharacter.generated.h"
 
+class AFFS_AIController;
+class UBehaviorTree;
 class UWidgetComponent;
 /**
  * 
@@ -23,6 +25,7 @@ class FROZENFLAMESANCTUM_API AFFS_EnemyCharacter : public AFFS_CharacterBase, pu
 public:
 	AFFS_EnemyCharacter();
 
+	virtual void PossessedBy(AController* NewController) override;
 	// Begin IMarkableInterface
 	void MarkActor() override;
 	void UnmarkActor() override;
@@ -59,6 +62,11 @@ protected:
 	int32 Level = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	EEnemyType EnemyType = EEnemyType::Melee;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+	UPROPERTY()
+	TObjectPtr<AFFS_AIController> FFS_AIController;
 private:
 	void SetupAbilitySystemComponent();
 };

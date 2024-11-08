@@ -9,6 +9,9 @@
 #include "UI/Widgets/FFS_UserWidget.h"
 #include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
 #include "FFS_GameplayTags.h"
+#include "AI/FFS_AIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 AFFS_EnemyCharacter::AFFS_EnemyCharacter()
 {
@@ -21,6 +24,15 @@ AFFS_EnemyCharacter::AFFS_EnemyCharacter()
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	HealthBar->SetupAttachment(GetRootComponent());
+}
+
+void AFFS_EnemyCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	FFS_AIController = Cast<AFFS_AIController>(NewController);
+	FFS_AIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	FFS_AIController->RunBehaviorTree(BehaviorTree);
 }
 
 void AFFS_EnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
