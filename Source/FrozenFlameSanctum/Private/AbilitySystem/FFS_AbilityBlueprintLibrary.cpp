@@ -2,6 +2,8 @@
 
 
 #include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
+
+#include "FFS_AbilityTypes.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "Game/FFS_GameModeBase.h"
@@ -50,7 +52,7 @@ void UFFS_AbilityBlueprintLibrary::InitializeDefaultAttributes(const UObject* Wo
 	AFFS_GameModeBase* FFS_GameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (FFS_GameMode == nullptr) return;
 
-	AActor* AvatarActor = AbilitySystemComponent->GetAvatarActor();
+	const AActor* AvatarActor = AbilitySystemComponent->GetAvatarActor();
 	UEnemiesData* EnemiesData = GetCharacterClassInfo(WorldContextObject);
 	FEnemyDefaultStats EnemyStats = EnemiesData->GetClassDefaultInfo(EnemyType);
 	
@@ -75,7 +77,7 @@ void UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(const UObject* WorldCont
 	if (FFS_GameMode == nullptr) return;
 	
 	UEnemiesData* EnemiesData = GetCharacterClassInfo(WorldContextObject);
-	for (TSubclassOf<UGameplayAbility> AbilityClass : EnemiesData->CommonAbilities)
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : EnemiesData->CommonAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		AbilitySystemComponent->GiveAbility(AbilitySpec);
@@ -87,4 +89,40 @@ UEnemiesData* UFFS_AbilityBlueprintLibrary::GetCharacterClassInfo(const UObject*
 	AFFS_GameModeBase* FFS_GameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (FFS_GameMode == nullptr) return nullptr;
 	return FFS_GameMode->EnemiesData;
+}
+
+bool UFFS_AbilityBlueprintLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FFFS_GameplayEffectContext* FFS_GameplayEffectContext = static_cast<const FFFS_GameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return FFS_GameplayEffectContext->IsBlockedHit();
+	}
+	return false;
+}
+
+bool UFFS_AbilityBlueprintLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FFFS_GameplayEffectContext* FFS_GameplayEffectContext = static_cast<const FFFS_GameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return FFS_GameplayEffectContext->IsCriticalHit();
+	}
+	return false;
+}
+
+void UFFS_AbilityBlueprintLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle,
+                                                   const bool bInIsBlockedHit)
+{
+	if (FFFS_GameplayEffectContext* FFS_GameplayEffectContext = static_cast<FFFS_GameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		FFS_GameplayEffectContext->SetIsBlockedHit(bInIsBlockedHit);
+	}
+}
+
+void UFFS_AbilityBlueprintLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle,
+                                                    const bool bInIsCriticalHit)
+{
+	if (FFFS_GameplayEffectContext* FFS_GameplayEffectContext = static_cast<FFFS_GameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		FFS_GameplayEffectContext->SetIsCriticalHit(bInIsCriticalHit);
+	}
 }

@@ -108,6 +108,48 @@ void FFFS_GameplayTags::InitializeNativeGameplayTags()
 		FString("Damage")
 	);
 
+	//Damage Types
+	GameplayTags.FireDamage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Fire"),
+		FString("Fire Damage Type")
+		);
+	GameplayTags.LightningDamage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Damage.Lightning"),
+			FString("Lightning Damage Type")
+			);
+	GameplayTags.MagicalDamage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Magical"),
+		FString("Magical Damage Type")
+		);
+	GameplayTags.PhysicalDamage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Physical"),
+		FString("Physical Damage Type")
+		);
+
+	//Resistance Types
+	GameplayTags.Attribute_Resistance_Magic = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Attribute.Resistance.Magic"),
+			FString("Resistance to magic damage")
+			);
+	GameplayTags.Attribute_Resistance_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attribute.Resistance.Fire"),
+		FString("Resistance to Fire damage")
+		);
+	GameplayTags.Attribute_Resistance_Lightning = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attribute.Resistance.Lightning"),
+		FString("Resistance to Lightning damage")
+		);
+	GameplayTags.Attribute_Resistance_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attribute.Resistance.Physical"),
+		FString("Resistance to Physical damage")
+		);
+
+	//Map Damage types to resistance
+	GameplayTags.DamageTypeToResistanceType.Add(GameplayTags.PhysicalDamage, GameplayTags.Attribute_Resistance_Physical);
+	GameplayTags.DamageTypeToResistanceType.Add(GameplayTags.FireDamage, GameplayTags.Attribute_Resistance_Fire);
+	GameplayTags.DamageTypeToResistanceType.Add(GameplayTags.LightningDamage, GameplayTags.Attribute_Resistance_Lightning);
+	GameplayTags.DamageTypeToResistanceType.Add(GameplayTags.MagicalDamage, GameplayTags.Attribute_Resistance_Magic);
+	
 	GameplayTags.HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("HitReact"),
 		FString("Reat to being hitted")

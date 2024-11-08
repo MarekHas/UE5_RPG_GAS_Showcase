@@ -76,8 +76,10 @@ void AFFS_EnemyCharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UFFS_AbilitySystemComponent>(AbilitySystemComponent)->BindToAbilitySystemDelegates();
-
-	InitDefaultStats();
+	if(HasAuthority())
+	{
+		InitDefaultStats();
+	}
 }
 
 void AFFS_EnemyCharacter::InitDefaultStats() const

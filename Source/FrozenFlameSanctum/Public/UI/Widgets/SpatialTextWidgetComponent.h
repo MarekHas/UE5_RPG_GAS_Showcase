@@ -15,5 +15,5 @@ class FROZENFLAMESANCTUM_API USpatialTextWidgetComponent : public UWidgetCompone
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void SetDamageText(float Damage);
+	void SetDamageText(float Damage, bool bIsHitBlocked,bool bIsCriticalHitSuccessful);
 };

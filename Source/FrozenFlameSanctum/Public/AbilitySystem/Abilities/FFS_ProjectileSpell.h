@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/FFS_GameplayAbility.h"
+#include "FFS_DamageGameplayAbility.h"
+#include "AbilitySystem/Abilities/FFS_DamageGameplayAbility.h"
 #include "FFS_ProjectileSpell.generated.h"
 
 class AFFS_Projectile;
@@ -12,15 +13,13 @@ class UGameplayEffect;
  * 
  */
 UCLASS()
-class FROZENFLAMESANCTUM_API UFFS_ProjectileSpell : public UFFS_GameplayAbility
+class FROZENFLAMESANCTUM_API UFFS_ProjectileSpell : public UFFS_DamageGameplayAbility
 {
 	GENERATED_BODY()
 	
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	TSubclassOf<AFFS_Projectile> ProjectileClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	UFUNCTION(BlueprintCallable, Category = "Projectile")

@@ -32,6 +32,11 @@ public:
 	FGameplayTag Attribute_Secondary_CriticalHitDamage;
 	FGameplayTag Attribute_Secondary_CriticalHitResistance;
 
+	FGameplayTag Attribute_Resistance_Fire;
+	FGameplayTag Attribute_Resistance_Lightning;
+	FGameplayTag Attribute_Resistance_Magic;
+	FGameplayTag Attribute_Resistance_Physical;
+	
 	FGameplayTag Input_Left_Mouse_Button;
 	FGameplayTag Input_Right_Mouse_Button;
 	FGameplayTag Input_1;
@@ -39,8 +44,15 @@ public:
 	FGameplayTag Input_3;
 	FGameplayTag Input_4;
 
-	FGameplayTag Damage;
 	FGameplayTag HitReact;
+	FGameplayTag Damage;
+	//Damage Types
+	FGameplayTag FireDamage;
+	FGameplayTag LightningDamage;
+	FGameplayTag MagicalDamage;
+	FGameplayTag PhysicalDamage;
+	
+	TMap<FGameplayTag, FGameplayTag> DamageTypeToResistanceType;
 protected:
 private:
 	static FFFS_GameplayTags GameplayTags;

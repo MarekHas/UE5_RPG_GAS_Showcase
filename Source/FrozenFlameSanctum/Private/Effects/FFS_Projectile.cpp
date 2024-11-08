@@ -48,6 +48,17 @@ void AFFS_Projectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 {
 	//SpawnEffects();
 
+	if (DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	{
+		return;
+	}
+	if (!bHit)
+	{
+		//UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+		//if (LoopingSoundComponent) LoopingSoundComponent->Stop();
+	}
+	
 	if (HasAuthority())
 	{
 		if (UAbilitySystemComponent* HittedTargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))

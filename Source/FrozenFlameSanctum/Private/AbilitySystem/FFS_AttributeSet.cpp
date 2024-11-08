@@ -8,6 +8,7 @@
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 #include "FFS_GameplayTags.h"
+#include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
 #include "Interfaces/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/FFS_PlayerController.h"
@@ -33,6 +34,12 @@ UFFS_AttributeSet::UFFS_AttributeSet()
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_ManaRegeneration, GetManaRegenerationAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_MaxHealth, GetMaxHealthAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_MaxMana, GetMaxManaAttribute);
+
+	/* Resistance Attributes */
+	TagsToAttributes.Add(GameplayTags.Attribute_Resistance_Physical, GetPhysicalResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attribute_Resistance_Fire, GetFireResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attribute_Resistance_Lightning, GetLightningResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attribute_Resistance_Magic, GetMagicResistanceAttribute);
 }
 
 void UFFS_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -58,6 +65,12 @@ void UFFS_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, ManaRegeneration, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+
+	// Resistance Attributes
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, FireResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, LightningResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, MagicResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UFFS_AttributeSet, PhysicalResistance, COND_None, REPNOTIFY_Always);
 }
 
 void UFFS_AttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
@@ -139,9 +152,30 @@ void UFFS_AttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) 
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, MaxMana, OldMaxMana);
 }
+
 void UFFS_AttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, MaxHealth, OldMaxHealth);
+}
+
+void UFFS_AttributeSet::OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, PhysicalResistance, OldPhysicalResistance);
+}
+
+void UFFS_AttributeSet::OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, FireResistance, OldFireResistance);
+}
+
+void UFFS_AttributeSet::OnRep_LightningResistance(const FGameplayAttributeData& OldLightningResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, LightningResistance, OldLightningResistance);
+}
+
+void UFFS_AttributeSet::OnRep_MagicResistance(const FGameplayAttributeData& OldMagicResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UFFS_AttributeSet, MagicResistance, OldMagicResistance);
 }
 
 void UFFS_AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -181,9 +215,8 @@ void UFFS_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		{
 			const float NewHealth = GetHealth() - LocalIncomingDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-			const bool bIsDead = NewHealth <= 0.f;
 
-			if (bIsDead)
+			if (const bool bIsDead = NewHealth <= 0.f)
 			{
 				ICombatInterface* CombatInterface = Cast<ICombatInterface>(EffectProperties.TargetAvatarActor);
 				if (CombatInterface)
@@ -197,7 +230,11 @@ void UFFS_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				TagContainer.AddTag(FFFS_GameplayTags::Get().HitReact);
 				EffectProperties.TargetAbilitySystem->TryActivateAbilitiesByTag(TagContainer);
 			}
-			ShowDamageText(EffectProperties, LocalIncomingDamage);
+			
+			const bool bBlockedHit = UFFS_AbilityBlueprintLibrary::IsBlockedHit(EffectProperties.EffectContextHandle);
+			const bool bCriticalHit = UFFS_AbilityBlueprintLibrary::IsCriticalHit(EffectProperties.EffectContextHandle);
+
+			ShowDamageText(EffectProperties, LocalIncomingDamage, bBlockedHit, bCriticalHit);
 		}
 	}
 }
@@ -233,13 +270,13 @@ void UFFS_AttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 	}
 }
 
-void UFFS_AttributeSet::ShowDamageText(const FEffectProperties& Props, float Damage) const
+void UFFS_AttributeSet::ShowDamageText(const FEffectProperties& EffectProperties, const float Damage, const bool bBlockedHit, const bool bCriticalHit) const
 {
-	if (Props.SourceCharacter != Props.TargetCharacter)
+	if (EffectProperties.SourceCharacter != EffectProperties.TargetCharacter)
 	{
-		if (AFFS_PlayerController* PlayerController = Cast<AFFS_PlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
+		if (AFFS_PlayerController* PlayerController = Cast<AFFS_PlayerController>(EffectProperties.SourceCharacter->Controller))
 		{
-			PlayerController->ShowDamageValue(Damage, Props.TargetCharacter);
+			PlayerController->ShowDamageValue(Damage, EffectProperties.TargetCharacter, bBlockedHit,bCriticalHit);
 		}
 	}
 }

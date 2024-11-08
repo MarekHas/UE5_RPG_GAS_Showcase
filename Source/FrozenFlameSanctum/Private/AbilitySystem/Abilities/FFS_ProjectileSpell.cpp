@@ -25,9 +25,7 @@ void UFFS_ProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		if (CombatInterface)
 		{
 			const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
-			
-			FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
-			Rotation.Pitch = 0.f;
+			const FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 
 			FTransform SpawnTransform;
 			SpawnTransform.SetLocation(SocketLocation);
@@ -41,12 +39,25 @@ void UFFS_ProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 				ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 			
 			const UAbilitySystemComponent* SourceAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
-			const FGameplayEffectSpecHandle SpecHandle = SourceAbilitySystemComponent->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceAbilitySystemComponent->MakeEffectContext());
 			
-			const FFFS_GameplayTags GameplayTags = FFFS_GameplayTags::Get();
-			const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+			FGameplayEffectContextHandle EffectContextHandle = SourceAbilitySystemComponent->MakeEffectContext();
+			EffectContextHandle.SetAbility(this);
+			EffectContextHandle.AddSourceObject(Projectile);
+			TArray<TWeakObjectPtr<AActor>> Actors;
+			Actors.Add(Projectile);
+			EffectContextHandle.AddActors(Actors);
+			FHitResult HitResult;
+			HitResult.Location = ProjectileTargetLocation;
+			EffectContextHandle.AddHitResult(HitResult);
 
-			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
+			const FGameplayEffectSpecHandle SpecHandle = SourceAbilitySystemComponent->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
+			const FFFS_GameplayTags GameplayTags = FFFS_GameplayTags::Get();
+
+			for (auto& Pair : DamageTypes)
+			{
+				const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
+				UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
+			}
 			
 			Projectile->DamageEffectSpecHandle = SpecHandle;
 

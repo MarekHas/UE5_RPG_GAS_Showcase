@@ -40,15 +40,16 @@ void AFFS_PlayerController::PlayerTick(float DeltaTime)
 	AutoRun();
 }
 
-void AFFS_PlayerController::ShowDamageValue_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+void AFFS_PlayerController::ShowDamageValue_Implementation(float DamageAmount, ACharacter* TargetCharacter,
+                                                           const bool bIsHitBlocked, const bool bIsCriticalHitSuccessful)
 {
-	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	if (IsValid(TargetCharacter) && DamageTextComponentClass && IsLocalController())
 	{
 		USpatialTextWidgetComponent* DamageText = NewObject<USpatialTextWidgetComponent>(TargetCharacter, DamageTextComponentClass);
 		DamageText->RegisterComponent();
 		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		DamageText->SetDamageText(DamageAmount);
+		DamageText->SetDamageText(DamageAmount, bIsHitBlocked, bIsCriticalHitSuccessful);
 	}
 }
 
