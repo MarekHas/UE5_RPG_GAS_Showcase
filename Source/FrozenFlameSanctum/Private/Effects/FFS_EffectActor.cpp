@@ -21,6 +21,8 @@ void AFFS_EffectActor::BeginPlay()
 
 void AFFS_EffectActor::ApplyEffectToActor(TSubclassOf<UGameplayEffect> InGameplayEffectClass, AActor* AffectedActor)
 {
+	if (AffectedActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	UAbilitySystemComponent* AffectedActorAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(AffectedActor);
 	if (AffectedActorAbilitySystemComponent == nullptr) return;
 
@@ -38,10 +40,16 @@ void AFFS_EffectActor::ApplyEffectToActor(TSubclassOf<UGameplayEffect> InGamepla
 	{
 		ActiveEffectHandles.Add(ActiveEffectHandle, AffectedActorAbilitySystemComponent);
 	}
+	if (!bIsInfiniteEffect)
+	{
+		Destroy();
+	}
 }
 
 void AFFS_EffectActor::OnOverlap(AActor* OverlapActor)
 {
+	if (OverlapActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	if (ApplicationType == EEffectApplicationType::OnOverlap) 
 	{
 		ApplyEffectToActor(GameplayEffectClass, OverlapActor);
@@ -50,6 +58,7 @@ void AFFS_EffectActor::OnOverlap(AActor* OverlapActor)
 
 void AFFS_EffectActor::OnEndOverlap(AActor* OverlapActor)
 {
+	if (OverlapActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
 	if (ApplicationType == EEffectApplicationType::OnEndOverlap)
 	{
 		ApplyEffectToActor(GameplayEffectClass, OverlapActor);
