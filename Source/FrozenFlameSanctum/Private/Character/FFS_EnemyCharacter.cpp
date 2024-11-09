@@ -19,7 +19,11 @@ AFFS_EnemyCharacter::AFFS_EnemyCharacter()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 
 	SetupAbilitySystemComponent();
-
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	
 	AttributeSet = CreateDefaultSubobject<UFFS_AttributeSet>("AttributeSet");
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
@@ -33,12 +37,16 @@ void AFFS_EnemyCharacter::PossessedBy(AController* NewController)
 	FFS_AIController = Cast<AFFS_AIController>(NewController);
 	FFS_AIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
 	FFS_AIController->RunBehaviorTree(BehaviorTree);
+	
+	FFS_AIController->GetBlackboardComponent()->SetValueAsBool(FName("TakeHit"), false);
+	FFS_AIController->GetBlackboardComponent()->SetValueAsBool(FName("RangeAttack"), EnemyType == EEnemyType::Range);
 }
 
-void AFFS_EnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+void AFFS_EnemyCharacter::HitReactionTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	FFS_AIController->GetBlackboardComponent()->SetValueAsBool(FName("TakeHit"), bHitReacting);
 }
 
 void AFFS_EnemyCharacter::BeginPlay()
@@ -76,7 +84,7 @@ void AFFS_EnemyCharacter::BeginPlay()
 		
 		AbilitySystemComponent->RegisterGameplayTagEvent(FFFS_GameplayTags::Get().HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
 			this,
-			&AFFS_EnemyCharacter::HitReactTagChanged
+			&AFFS_EnemyCharacter::HitReactionTagChanged
 		);
 
 		OnHealthChanged.Broadcast(FFS_AttributeSet->GetHealth());
@@ -88,10 +96,8 @@ void AFFS_EnemyCharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UFFS_AbilitySystemComponent>(AbilitySystemComponent)->BindToAbilitySystemDelegates();
-	if(HasAuthority())
-	{
-		InitDefaultStats();
-	}
+	
+	InitDefaultStats();
 }
 
 void AFFS_EnemyCharacter::InitDefaultStats() const
