@@ -42,11 +42,24 @@ void AFFS_EnemyCharacter::PossessedBy(AController* NewController)
 	FFS_AIController->GetBlackboardComponent()->SetValueAsBool(FName("RangeAttack"), EnemyType == EEnemyType::Range);
 }
 
+void AFFS_EnemyCharacter::SetAttackTarget_Implementation(AActor* InTarget)
+{
+	AttackTarget = InTarget;
+}
+
+AActor* AFFS_EnemyCharacter::GetAttackTarget_Implementation() const
+{
+	return AttackTarget;
+}
+
 void AFFS_EnemyCharacter::HitReactionTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
-	FFS_AIController->GetBlackboardComponent()->SetValueAsBool(FName("TakeHit"), bHitReacting);
+	if(FFS_AIController && FFS_AIController->GetBlackboardComponent())
+	{
+		FFS_AIController->GetBlackboardComponent()->SetValueAsBool(FName("TakeHit"), bHitReacting);
+	}
 }
 
 void AFFS_EnemyCharacter::BeginPlay()
@@ -57,10 +70,10 @@ void AFFS_EnemyCharacter::BeginPlay()
 	check(AbilitySystemComponent);
 	InitAbilityActorInfo();
 
-	if (HasAuthority()) 
-	{
-		UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
-	}
+	// if (HasAuthority()) 
+	// {
+	// 	UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent, EnemyType);
+	// }
 	
 	if (UFFS_UserWidget* FFS_UserWidget = Cast<UFFS_UserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -96,14 +109,16 @@ void AFFS_EnemyCharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UFFS_AbilitySystemComponent>(AbilitySystemComponent)->BindToAbilitySystemDelegates();
-	
-	InitDefaultStats();
+	if(HasAuthority())
+	{
+		InitDefaultStats();
+	}
 }
 
 void AFFS_EnemyCharacter::InitDefaultStats() const
 {
 	UFFS_AbilityBlueprintLibrary::InitializeDefaultAttributes(this, EnemyType, Level, AbilitySystemComponent);
-	UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent,EnemyType);
 }
 
 void AFFS_EnemyCharacter::SetupAbilitySystemComponent()

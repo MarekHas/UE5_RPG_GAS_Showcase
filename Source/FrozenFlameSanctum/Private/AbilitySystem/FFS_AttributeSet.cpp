@@ -277,6 +277,11 @@ void UFFS_AttributeSet::ShowDamageText(const FEffectProperties& EffectProperties
 		if (AFFS_PlayerController* PlayerController = Cast<AFFS_PlayerController>(EffectProperties.SourceCharacter->Controller))
 		{
 			PlayerController->ShowDamageValue(Damage, EffectProperties.TargetCharacter, bBlockedHit,bCriticalHit);
+			return;
+		}
+		if (AFFS_PlayerController* PlayerController = Cast<AFFS_PlayerController>(EffectProperties.TargetCharacter->Controller))
+		{
+			PlayerController->ShowDamageValue(Damage, EffectProperties.TargetCharacter, bBlockedHit,bCriticalHit);
 		}
 	}
 }

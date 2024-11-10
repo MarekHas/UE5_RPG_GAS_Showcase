@@ -43,6 +43,11 @@ void AFFS_CharacterBase::Death()
 	Multicast_OnDeath();
 }
 
+bool AFFS_CharacterBase::IsDead_Implementation() const
+{
+	return bIsDead;
+}
+
 void AFFS_CharacterBase::Multicast_OnDeath_Implementation()
 {
 	Weapon->SetSimulatePhysics(true);
@@ -55,19 +60,24 @@ void AFFS_CharacterBase::Multicast_OnDeath_Implementation()
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	bIsDead = true;
 }
 
 // Called when the game starts or when spawned
 void AFFS_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
-FVector AFFS_CharacterBase::GetCombatSocketLocation()
+FVector AFFS_CharacterBase::GetCombatSocketLocation_Implementation()
 {
 	check(GetMesh());
 	return GetMesh()->GetSocketLocation(WeaponTipSocketName);
+}
+
+AActor* AFFS_CharacterBase::GetAvatarActor_Implementation()
+{
+	return this;
 }
 
 void AFFS_CharacterBase::InitAbilityActorInfo()

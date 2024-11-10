@@ -3,15 +3,17 @@
 
 #include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
 
-#include "FFS_AbilityTypes.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/OverlapResult.h"
 
+#include "FFS_AbilityTypes.h"
 #include "Game/FFS_GameModeBase.h"
 #include "Player/FFS_PlayerState.h"
 #include "UI/HUD/FFS_GameHUD.h"
 #include "UI/WidgetControllers/FFS_WidgetController.h"
 #include "UI/WidgetControllers/FFS_PlayerStatsWidgetController.h"
 #include "AbilitySystem/Data/EnemiesData.h"
+#include "Interfaces/CombatInterface.h"
 
 UFFS_PlayerStatsWidgetController* UFFS_AbilityBlueprintLibrary::GetWidgetController(const UObject* WorldContextObject)
 {
@@ -71,16 +73,24 @@ void UFFS_AbilityBlueprintLibrary::InitializeDefaultAttributes(const UObject* Wo
 	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }
 
-void UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent)
+void UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent, EEnemyType EnemyType)
 {
-	AFFS_GameModeBase* FFS_GameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (FFS_GameMode == nullptr) return;
-	
 	UEnemiesData* EnemiesData = GetCharacterClassInfo(WorldContextObject);
+	if(EnemiesData == nullptr) return;
+	
 	for (const TSubclassOf<UGameplayAbility> AbilityClass : EnemiesData->CommonAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		AbilitySystemComponent->GiveAbility(AbilitySpec);
+	}
+	const FEnemyDefaultStats& DefaultInfo = EnemiesData->GetClassDefaultInfo(EnemyType);
+	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultInfo.StartupAbilities)
+	{
+		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(AbilitySystemComponent->GetAvatarActor()))
+		{
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, CombatInterface->GetPlayerLevel());
+			AbilitySystemComponent->GiveAbility(AbilitySpec);
+		}
 	}
 }
 
@@ -89,6 +99,33 @@ UEnemiesData* UFFS_AbilityBlueprintLibrary::GetCharacterClassInfo(const UObject*
 	AFFS_GameModeBase* FFS_GameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (FFS_GameMode == nullptr) return nullptr;
 	return FFS_GameMode->EnemiesData;
+}
+
+void UFFS_AbilityBlueprintLibrary::GetLivePlayersInRange(const UObject* WorldContextObject,
+	TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& ActorsToIgnore, float Range, const FVector& SphereOrigin)
+{
+	FCollisionQueryParams SphereParams;
+	SphereParams.AddIgnoredActors(ActorsToIgnore);
+	
+	if (const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+	{
+		TArray<FOverlapResult> Overlaps;
+		World->OverlapMultiByObjectType(
+			Overlaps,
+			SphereOrigin,
+			FQuat::Identity,
+			FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects),
+			FCollisionShape::MakeSphere(Range),
+			SphereParams);
+		
+		for (FOverlapResult& Overlap : Overlaps)
+		{
+			if (Overlap.GetActor()->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsDead(Overlap.GetActor()))
+			{
+				OutOverlappingActors.AddUnique(ICombatInterface::Execute_GetAvatarActor(Overlap.GetActor()));
+			}
+		}
+	}
 }
 
 bool UFFS_AbilityBlueprintLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)

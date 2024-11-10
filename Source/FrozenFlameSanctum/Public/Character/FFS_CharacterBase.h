@@ -30,9 +30,7 @@ public:
 	//~ End IAbilitySystemInterface Interface
 
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
-	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
-	
-	virtual void Death() override;
+
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void Multicast_OnDeath();
 
@@ -41,14 +39,21 @@ protected:
 	//~ Begin AActor Interface.
 	virtual void BeginPlay() override;
 	//~ End AActor Interface.
+	
+	//~ Begin ICombatInterface
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+	virtual FVector GetCombatSocketLocation_Implementation() override;
+	virtual AActor* GetAvatarActor_Implementation() override;
+	virtual void Death() override;
+	virtual bool IsDead_Implementation() const override;
+	//~end ICombatInterface
 
 	UPROPERTY(EditAnywhere, Category ="Props")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName WeaponTipSocketName;
-	virtual FVector GetCombatSocketLocation() override;
-
+	bool bIsDead = false;
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
@@ -64,7 +69,6 @@ protected:
 
 
 	virtual void InitAbilityActorInfo();
-
 	virtual void InitDefaultStats() const;
 
 	void InitStatsFromEffect(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;

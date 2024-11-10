@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 
 #include "Character/FFS_CharacterBase.h"
+
+#include "Interfaces/EnemyInterface.h"
 #include "Interfaces/MarkableInterface.h"
 #include "UI/WidgetControllers/FFS_PlayerStatsWidgetController.h"
 #include "AbilitySystem/Data/EnemiesData.h"
@@ -18,7 +20,7 @@ class UWidgetComponent;
  * 
  */
 UCLASS()
-class FROZENFLAMESANCTUM_API AFFS_EnemyCharacter : public AFFS_CharacterBase, public IMarkableInterface
+class FROZENFLAMESANCTUM_API AFFS_EnemyCharacter : public AFFS_CharacterBase, public IEnemyInterface, public IMarkableInterface
 {
 	GENERATED_BODY()
 	
@@ -26,6 +28,12 @@ public:
 	AFFS_EnemyCharacter();
 
 	virtual void PossessedBy(AController* NewController) override;
+
+	// Begin IEnemyInterface
+	virtual void SetAttackTarget_Implementation(AActor* InTarget) override;
+	virtual AActor* GetAttackTarget_Implementation() const override;
+	//End IEnemyInterface
+	
 	// Begin IMarkableInterface
 	void MarkActor() override;
 	void UnmarkActor() override;
@@ -48,7 +56,8 @@ public:
 	float BaseWalkSpeed = 250.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float LifeTime = 5.f;
-
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<AActor> AttackTarget;
 protected:
 	virtual void BeginPlay() override;
 	//~Begin AFFS_CharacterBase override

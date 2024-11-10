@@ -13,6 +13,9 @@ UCLASS()
 class FROZENFLAMESANCTUM_API UFFS_DamageGameplayAbility : public UFFS_GameplayAbility
 {
 	GENERATED_BODY()
+public:
+	UFUNCTION(BlueprintCallable)
+	void DealDamage(AActor* TargetActor);
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UGameplayEffect> DamageEffectClass;

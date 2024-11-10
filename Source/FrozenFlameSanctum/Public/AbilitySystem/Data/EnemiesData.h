@@ -23,6 +23,8 @@ struct FEnemyDefaultStats
 	GENERATED_BODY()
 	UPROPERTY(EditDefaultsOnly, Category = "EnemyData")
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
+	UPROPERTY(EditDefaultsOnly, Category = "EnemyData")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };
 
 /**
@@ -44,6 +46,6 @@ public:
 	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
 	UPROPERTY(EditDefaultsOnly, Category = "EnemyData|Damage")
 	TObjectPtr<UCurveTable> DamageCalculationCoefficients;
-
+	
 	FEnemyDefaultStats GetClassDefaultInfo(EEnemyType EnemyType);
 };
