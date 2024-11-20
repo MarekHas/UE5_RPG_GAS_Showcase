@@ -67,6 +67,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> InitialDerivedStats;
 
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> InitialPassiveAbilities;
 
 	virtual void InitAbilityActorInfo();
 	virtual void InitDefaultStats() const;

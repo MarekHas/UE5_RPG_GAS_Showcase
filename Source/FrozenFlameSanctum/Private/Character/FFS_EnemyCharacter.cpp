@@ -52,6 +52,11 @@ AActor* AFFS_EnemyCharacter::GetAttackTarget_Implementation() const
 	return AttackTarget;
 }
 
+EEnemyType AFFS_EnemyCharacter::GetEnemyType_Implementation()
+{
+	return EnemyType;
+}
+
 void AFFS_EnemyCharacter::HitReactionTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
@@ -140,7 +145,7 @@ void AFFS_EnemyCharacter::UnmarkActor()
 	GetMesh()->SetCustomDepthStencilValue(0);
 }
 
-int32 AFFS_EnemyCharacter::GetPlayerLevel()
+int32 AFFS_EnemyCharacter::GetPlayerLevel_Implementation()
 {
 	return Level;
 }
@@ -148,6 +153,7 @@ int32 AFFS_EnemyCharacter::GetPlayerLevel()
 void AFFS_EnemyCharacter::Death()
 {
 	SetLifeSpan(LifeTime);
+	if(FFS_AIController) FFS_AIController->GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), true);
 	Super::Death();
 }
 

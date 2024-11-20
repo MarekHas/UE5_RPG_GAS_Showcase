@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ScalableFloat.h"
 #include "Engine/DataAsset.h"
 #include "EnemiesData.generated.h"
 
@@ -25,6 +26,8 @@ struct FEnemyDefaultStats
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
 	UPROPERTY(EditDefaultsOnly, Category = "EnemyData")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	UPROPERTY(EditDefaultsOnly, Category = "EnemyData")
+	FScalableFloat ExperiencePointsReward = FScalableFloat();
 };
 
 /**

@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Character/FFS_CharacterBase.h"
+#include "Interfaces/PlayerInterface.h"
 #include "FFS_HeroCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FROZENFLAMESANCTUM_API AFFS_HeroCharacter : public AFFS_CharacterBase
+class FROZENFLAMESANCTUM_API AFFS_HeroCharacter : public AFFS_CharacterBase, public IPlayerInterface
 {
 	GENERATED_BODY()
 
@@ -25,9 +26,27 @@ public:
 	/** APawn 
 	* PlayerState Replication Notification Callback*/
 	virtual void OnRep_PlayerState() override;
+
+	/** Player Interface */
+	virtual void AddExperiencePoints_Implementation(int32 InExperiencePoints) override;
+	virtual void LevelUp_Implementation() override;
+
+	
+	virtual int32 CheckLevelForGivenExperience_Implementation(int32 InExperiencePoints) const override;
+	
+	virtual int32 GetExperiencePoints_Implementation() const override;
+	virtual int32 GetSkillPointsReceived_Implementation(int32 Level) const override;
+	virtual int32 GetSpellPointsReceived_Implementation(int32 Level) const override;
+	
+	virtual void AddPlayerLevel_Implementation(int32 InPlayerLevel) override;
+	virtual void AddSkillPoints_Implementation(int32 InSkillPoints) override;
+	virtual void AddSpellPoints_Implementation(int32 InSpellPoints) override;
+	/** end Player Interface */
+	
 	/** Combat Interface */
-	virtual int32 GetPlayerLevel() override;
+	virtual int32 GetPlayerLevel_Implementation() override;
 	/** end Combat Interface */
+	
 private:
 	//~Begin AFFS_CharacterBase override
 	virtual void InitAbilityActorInfo() override;

@@ -10,7 +10,8 @@
 #include "FFS_GameplayTags.h"
 #include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
 #include "Interfaces/CombatInterface.h"
-#include "Kismet/GameplayStatics.h"
+#include "Interfaces/EnemyInterface.h"
+#include "Interfaces/PlayerInterface.h"
 #include "Player/FFS_PlayerController.h"
 
 UFFS_AttributeSet::UFFS_AttributeSet()
@@ -198,7 +199,7 @@ void UFFS_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 	FEffectProperties EffectProperties;
 	SetEffectProperties(Data, EffectProperties);
-
+	//Health and Mana
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
@@ -207,6 +208,7 @@ void UFFS_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
 	}
+	//Incoming Damge
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		const float LocalIncomingDamage = GetIncomingDamage();
@@ -223,6 +225,7 @@ void UFFS_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				{
 					CombatInterface->Death();
 				}
+				SendExperiencePointsReceivedEvent(EffectProperties);
 			}
 			else
 			{
@@ -235,6 +238,39 @@ void UFFS_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			const bool bCriticalHit = UFFS_AbilityBlueprintLibrary::IsCriticalHit(EffectProperties.EffectContextHandle);
 
 			ShowDamageText(EffectProperties, LocalIncomingDamage, bBlockedHit, bCriticalHit);
+		}
+	}
+	
+	//Received Experience
+	if (Data.EvaluatedData.Attribute == GetExperiencePointsReceivedAttribute())
+	{
+		const float LocalIncomingXP = GetExperiencePointsReceived();
+		SetExperiencePointsReceived(50.f);
+		
+		if (EffectProperties.SourceCharacter->Implements<UPlayerInterface>()
+			&& EffectProperties.SourceCharacter->Implements<UCombatInterface>())
+		{
+			const int32 CurrentLevel = ICombatInterface::Execute_GetPlayerLevel(EffectProperties.SourceCharacter);
+			const int32 CurrentExperience = IPlayerInterface::Execute_GetExperiencePoints(EffectProperties.SourceCharacter);
+			const int32 NewLevel = IPlayerInterface::Execute_CheckLevelForGivenExperience(EffectProperties.SourceCharacter, CurrentExperience + LocalIncomingXP);
+			const int32 NumLevelUps = NewLevel - CurrentLevel;
+
+			if (NumLevelUps > 0)
+			{
+				const int32 SkillPointsReceived = IPlayerInterface::Execute_GetSkillPointsReceived(EffectProperties.SourceCharacter, CurrentLevel);
+				const int32 SpellPointsReceived = IPlayerInterface::Execute_GetSpellPointsReceived(EffectProperties.SourceCharacter, CurrentLevel);
+				
+				IPlayerInterface::Execute_AddPlayerLevel(EffectProperties.SourceCharacter, NumLevelUps);
+				IPlayerInterface::Execute_AddSkillPoints(EffectProperties.SourceCharacter, SkillPointsReceived);
+				IPlayerInterface::Execute_AddSpellPoints(EffectProperties.SourceCharacter, SpellPointsReceived);
+	
+				SetHealth(GetMaxHealth());
+				SetMana(GetMaxMana());
+				
+				IPlayerInterface::Execute_LevelUp(EffectProperties.SourceCharacter);
+			}
+			
+			IPlayerInterface::Execute_AddExperiencePoints(EffectProperties.SourceCharacter, 50);
 		}
 	}
 }
@@ -283,5 +319,23 @@ void UFFS_AttributeSet::ShowDamageText(const FEffectProperties& EffectProperties
 		{
 			PlayerController->ShowDamageValue(Damage, EffectProperties.TargetCharacter, bBlockedHit,bCriticalHit);
 		}
+	}
+}
+
+void UFFS_AttributeSet::SendExperiencePointsReceivedEvent(const FEffectProperties& EffectProperties)
+{
+	if (EffectProperties.TargetCharacter->Implements<UEnemyInterface>()
+		&& EffectProperties.TargetCharacter->Implements<UCombatInterface>())
+	{
+		const int32 TargetLevel =  ICombatInterface::Execute_GetPlayerLevel(EffectProperties.TargetCharacter);
+		const EEnemyType TargetClass = IEnemyInterface::Execute_GetEnemyType(EffectProperties.TargetCharacter);
+		const int32 XPReward = UFFS_AbilityBlueprintLibrary::ExperiencePointsForKilledEnemy(EffectProperties.TargetCharacter, TargetClass, TargetLevel);
+		const FFFS_GameplayTags& GameplayTags = FFFS_GameplayTags::Get();
+		FGameplayEventData Payload;
+		
+		Payload.Instigator = EffectProperties.SourceCharacter;
+		Payload.EventTag = GameplayTags.Attribute_GameEvent_ExperienceReceived;
+		Payload.EventMagnitude = XPReward;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(EffectProperties.SourceCharacter, GameplayTags.Attribute_GameEvent_ExperienceReceived, Payload);
 	}
 }

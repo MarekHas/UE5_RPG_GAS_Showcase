@@ -28,6 +28,7 @@ struct FNotificationWidgetRow : public FTableRowBase
 
 class UFFS_UserWidget;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerLevelChangedSignature, int32, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatsChangedSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationSignature, FNotificationWidgetRow, Notification);
 
@@ -54,6 +55,11 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
 	FOnPlayerStatsChangedSignature OnMaxManaChangedDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|ExperiencePoints")
+	FOnPlayerStatsChangedSignature OnExperiencePointsChangedDelegate;
+	UPROPERTY(BlueprintAssignable, Category="GAS|Level")
+	FOnPlayerLevelChangedSignature OnPlayerLevelChangedDelegate;
 	
 	UPROPERTY(BlueprintAssignable, Category = "Notifications")
 	FOnNotificationSignature OnNotificationDelegate;
@@ -61,6 +67,9 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Notifications")
 	TObjectPtr<UDataTable> NotificationWidgetsDataTable;
+
+	//void OnInitializeStartupAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent);
+	void OnExperiencePointsChanged(int32 NewExperiencePoints) const;
 
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);

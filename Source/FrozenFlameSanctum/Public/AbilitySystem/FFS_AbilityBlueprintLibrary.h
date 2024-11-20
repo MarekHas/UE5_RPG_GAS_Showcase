@@ -46,4 +46,6 @@ public:
 	static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool bInIsBlockedHit);
 	UFUNCTION(BlueprintCallable, Category = "FFS_AbilityBlueprintLibrary|GameplayEffects")
 	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool bInIsCriticalHit);
+
+	static int32 ExperiencePointsForKilledEnemy(const UObject* WorldContextObject, EEnemyType EnemyType, int32 Level);
 };

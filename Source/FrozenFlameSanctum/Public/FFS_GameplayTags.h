@@ -36,6 +36,8 @@ public:
 	FGameplayTag Attribute_Resistance_Lightning;
 	FGameplayTag Attribute_Resistance_Magic;
 	FGameplayTag Attribute_Resistance_Physical;
+
+	FGameplayTag Attribute_GameEvent_ExperienceReceived;
 	
 	FGameplayTag Input_Left_Mouse_Button;
 	FGameplayTag Input_Right_Mouse_Button;

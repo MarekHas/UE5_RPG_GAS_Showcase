@@ -48,7 +48,7 @@ void AFFS_Projectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 {
 	//SpawnEffects();
 
-	if (DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	if (!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
 	{
 		return;
 	}

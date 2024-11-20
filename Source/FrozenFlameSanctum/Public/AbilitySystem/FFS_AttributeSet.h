@@ -181,6 +181,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
 	FGameplayAttributeData IncomingDamage;
 	ATTRIBUTE_ACCESSORS(UFFS_AttributeSet, IncomingDamage);
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData ExperiencePointsReceived;
+	ATTRIBUTE_ACCESSORS(UFFS_AttributeSet, ExperiencePointsReceived);
 #pragma region Basic stats Rep Notifay
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
@@ -239,4 +242,5 @@ public:
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProperties) const;
 	void ShowDamageText(const FEffectProperties& EffectProperties, const float Damage, bool bBlockedHit, bool bCriticalHit) const;
+	void SendExperiencePointsReceivedEvent(const FEffectProperties& EffectProperties);
 };

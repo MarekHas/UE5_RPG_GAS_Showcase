@@ -89,9 +89,17 @@ void UDamage_ExecutionCalculation::Execute_Implementation(const FGameplayEffectC
 	AActor* SourceAvatar = SourceAbilitySystem ? SourceAbilitySystem->GetAvatarActor() : nullptr;
 	AActor* TargetAvatar = TargetAbilitySystem ? TargetAbilitySystem->GetAvatarActor() : nullptr;
 	
-	ICombatInterface* SourceCombatInterface = Cast<ICombatInterface>(SourceAvatar);
-	ICombatInterface* TargetCombatInterface = Cast<ICombatInterface>(TargetAvatar);
-
+	int32 SourcePlayerLevel = 1;
+	if (SourceAvatar->Implements<UCombatInterface>())
+	{
+		SourcePlayerLevel = ICombatInterface::Execute_GetPlayerLevel(SourceAvatar);
+	}
+	int32 TargetPlayerLevel = 1;
+	if (TargetAvatar->Implements<UCombatInterface>())
+	{
+		TargetPlayerLevel = ICombatInterface::Execute_GetPlayerLevel(TargetAvatar);
+	}
+	
 	const FGameplayEffectSpec& EffectSpec = ExecutionParams.GetOwningSpec();
 
 	const FGameplayTagContainer* SourceTags = EffectSpec.CapturedSourceTags.GetAggregatedTags();
@@ -138,12 +146,12 @@ void UDamage_ExecutionCalculation::Execute_Implementation(const FGameplayEffectC
 
 	const UEnemiesData* CharacterClassInfo = UFFS_AbilityBlueprintLibrary::GetCharacterClassInfo(SourceAvatar);
 	const FRealCurve* ArmorPenetrationCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("ArmorPenetration"), FString());
-	const float ArmorPenetrationMultiplier = ArmorPenetrationCurve->Eval(SourceCombatInterface->GetPlayerLevel());
+	const float ArmorPenetrationMultiplier = ArmorPenetrationCurve->Eval(SourcePlayerLevel);
 
 	const float EffectiveArmor = TargetArmor *= (100 - SourceArmorPenetration * ArmorPenetrationMultiplier) / 100.f;
 	
 	const FRealCurve* EffectiveArmorCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("EffectiveArmor"), FString());
-	const float EffectiveArmorMultiplier = EffectiveArmorCurve->Eval(TargetCombatInterface->GetPlayerLevel());
+	const float EffectiveArmorMultiplier = EffectiveArmorCurve->Eval(TargetPlayerLevel);
 
 	Damage *= (100 - EffectiveArmor * EffectiveArmorMultiplier) / 100.f;
 
@@ -159,7 +167,7 @@ void UDamage_ExecutionCalculation::Execute_Implementation(const FGameplayEffectC
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatsData().CriticalHitDamageDef, EvaluationParameters, SourceCriticalHitDamage);
 	SourceCriticalHitDamage = FMath::Max<float>(SourceCriticalHitDamage, 0.f);
 	const FRealCurve* CriticalHitResistanceCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("CriticalHitResistance"), FString());
-	const float CriticalHitResistanceMultiplier = CriticalHitResistanceCurve->Eval(TargetCombatInterface->GetPlayerLevel());
+	const float CriticalHitResistanceMultiplier = CriticalHitResistanceCurve->Eval(TargetPlayerLevel);
 	// Critical Hit Resistance reduces Critical Hit Chance by a certain percentage
 	const float EffectiveCriticalHitChance = SourceCriticalHitChance - TargetCriticalHitResistance * CriticalHitResistanceMultiplier;
 	const bool bCriticalHit = FMath::RandRange(1, 100) < EffectiveCriticalHitChance;

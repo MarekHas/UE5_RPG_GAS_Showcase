@@ -32,6 +32,7 @@ public:
 	// Begin IEnemyInterface
 	virtual void SetAttackTarget_Implementation(AActor* InTarget) override;
 	virtual AActor* GetAttackTarget_Implementation() const override;
+	virtual EEnemyType GetEnemyType_Implementation() override;
 	//End IEnemyInterface
 	
 	// Begin IMarkableInterface
@@ -40,7 +41,7 @@ public:
 	// end IMarkableInterface
 	
 	/** Combat Interface */
-	virtual int32 GetPlayerLevel() override;
+	virtual int32 GetPlayerLevel_Implementation() override;
 	virtual void Death() override;
 	/** end Combat Interface */
 
@@ -58,6 +59,8 @@ public:
 	float LifeTime = 5.f;
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<AActor> AttackTarget;
+	
+
 protected:
 	virtual void BeginPlay() override;
 	//~Begin AFFS_CharacterBase override

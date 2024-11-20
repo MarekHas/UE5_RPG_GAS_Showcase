@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/EnemiesData.h"
 #include "UObject/Interface.h"
 #include "EnemyInterface.generated.h"
 
@@ -26,4 +27,6 @@ public:
 	void SetAttackTarget(AActor* InTarget);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	AActor* GetAttackTarget() const;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	EEnemyType GetEnemyType();
 };

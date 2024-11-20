@@ -20,7 +20,7 @@ public:
 	void BindToAbilitySystemDelegates();
 	FOnEffectAppliedSignature OnEffectAppliedDelegate;
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
-
+	void AddPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilities);
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 protected:

@@ -4,6 +4,8 @@
 
 #include "AbilitySystem/FFS_AbilitySystemComponent.h"
 #include "AbilitySystem/FFS_AttributeSet.h"
+#include "AbilitySystem/Data/CharacterProgressData.h"
+#include "Player/FFS_PlayerState.h"
 
 void UFFS_PlayerStatsWidgetController::BroadcastInitialValues()
 {
@@ -17,8 +19,12 @@ void UFFS_PlayerStatsWidgetController::BroadcastInitialValues()
 
 void UFFS_PlayerStatsWidgetController::BindCallbacksToDependencies()
 {
+	AFFS_PlayerState* FFS_PlayerState = CastChecked<AFFS_PlayerState>(PlayerState);
+	FFS_PlayerState->OnExperiencePointsChangedDelegate.AddUObject(this, &UFFS_PlayerStatsWidgetController::OnExperiencePointsChanged);
+	FFS_PlayerState->OnPlayerLevelChangedDelegate.AddLambda(
+		[this](int32 NewLevel){OnPlayerLevelChangedDelegate.Broadcast(NewLevel);});
+	
 	const UFFS_AttributeSet* FFS_AttributeSet = CastChecked<UFFS_AttributeSet>(AttributeSet);
-
 	//Player Stats delegates
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 		FFS_AttributeSet->GetHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnHealthChangedDelegate.Broadcast(Data.NewValue); });
@@ -32,6 +38,7 @@ void UFFS_PlayerStatsWidgetController::BindCallbacksToDependencies()
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 		FFS_AttributeSet->GetMaxManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnMaxManaChangedDelegate.Broadcast(Data.NewValue); });
 
+	
 	//Notification about effect applied delegate
 	Cast<UFFS_AbilitySystemComponent>(AbilitySystemComponent)->OnEffectAppliedDelegate.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
@@ -58,4 +65,27 @@ void UFFS_PlayerStatsWidgetController::BindCallbacksToDependencies()
 			}
 		}
 	);
+}
+
+void UFFS_PlayerStatsWidgetController::OnExperiencePointsChanged(int32 NewExperiencePoints) const
+{
+	AFFS_PlayerState* FFS_PlayerState = CastChecked<AFFS_PlayerState>(PlayerState);
+	UCharacterProgressData* ProgressData = FFS_PlayerState->CharacterProgressData;
+
+	checkf(ProgressData, TEXT("Unable to find ProgressData. Missing on PlayerState Blueprint"));
+
+	const int32 CurrentLevel = ProgressData->GetCharacterLevel(NewExperiencePoints);
+	const int32 MaxLevel = ProgressData->LevelUpData.Num();
+
+	if (CurrentLevel <= MaxLevel && CurrentLevel > 0)
+	{
+		const int32 LevelUpPointsRequired = ProgressData->LevelUpData[CurrentLevel].ExperiencePointsRequired;
+		const int32 PreviousLevelUpPointsRequired = ProgressData->LevelUpData[CurrentLevel - 1].ExperiencePointsRequired;
+		
+		const int32 DeltaPointsRequired = LevelUpPointsRequired - PreviousLevelUpPointsRequired;
+		const int32 ActualPointsOnCurrentLevel = NewExperiencePoints - PreviousLevelUpPointsRequired;
+		const float PercentOfExperience = static_cast<float>(ActualPointsOnCurrentLevel) / static_cast<float>(DeltaPointsRequired);
+
+		OnExperiencePointsChangedDelegate.Broadcast(PercentOfExperience);
+	}
 }

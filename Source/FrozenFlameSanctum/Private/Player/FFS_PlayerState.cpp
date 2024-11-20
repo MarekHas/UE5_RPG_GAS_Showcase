@@ -21,11 +21,18 @@ void AFFS_PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AFFS_PlayerState, Level);
+	DOREPLIFETIME(AFFS_PlayerState, PlayerLevel);
+	DOREPLIFETIME(AFFS_PlayerState, ExperiencePoints);
 }
 
 void AFFS_PlayerState::OnRep_Level(int32 OldLevel)
 {
+	OnPlayerLevelChangedDelegate.Broadcast(OldLevel);
+}
+
+void AFFS_PlayerState::OnRep_ExperiencePoints(int32 OldExperiencePoints)
+{
+	OnExperiencePointsChangedDelegate.Broadcast(OldExperiencePoints);
 }
 
 void AFFS_PlayerState::SetupAbilitySystemComponent()
@@ -41,3 +48,27 @@ UAbilitySystemComponent* AFFS_PlayerState::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 //~ End IAbilitySystemInterface Interface
+
+void AFFS_PlayerState::AddExperiencePoints(const int32 InPoints)
+{
+	ExperiencePoints += InPoints;
+	OnExperiencePointsChangedDelegate.Broadcast(ExperiencePoints);
+}
+
+void AFFS_PlayerState::SetExperiencePoints(const int32 InPoints)
+{
+	ExperiencePoints = InPoints;
+	OnExperiencePointsChangedDelegate.Broadcast(ExperiencePoints);
+}
+
+void AFFS_PlayerState::LevelUp(const int32 InLevel)
+{
+	PlayerLevel += InLevel;
+	OnPlayerLevelChangedDelegate.Broadcast(PlayerLevel);
+}
+
+void AFFS_PlayerState::SetLevel(const int32 InLevel)
+{
+	PlayerLevel = InLevel;
+	OnPlayerLevelChangedDelegate.Broadcast(PlayerLevel);
+}

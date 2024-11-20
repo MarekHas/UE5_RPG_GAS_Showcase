@@ -86,9 +86,9 @@ void UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(const UObject* WorldCont
 	const FEnemyDefaultStats& DefaultInfo = EnemiesData->GetClassDefaultInfo(EnemyType);
 	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultInfo.StartupAbilities)
 	{
-		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(AbilitySystemComponent->GetAvatarActor()))
+		if (AbilitySystemComponent->GetAvatarActor()->Implements<UCombatInterface>())
 		{
-			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, CombatInterface->GetPlayerLevel());
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, ICombatInterface::Execute_GetPlayerLevel(AbilitySystemComponent->GetAvatarActor()));
 			AbilitySystemComponent->GiveAbility(AbilitySpec);
 		}
 	}
@@ -162,4 +162,14 @@ void UFFS_AbilityBlueprintLibrary::SetIsCriticalHit(FGameplayEffectContextHandle
 	{
 		FFS_GameplayEffectContext->SetIsCriticalHit(bInIsCriticalHit);
 	}
+}
+
+int32 UFFS_AbilityBlueprintLibrary::ExperiencePointsForKilledEnemy(const UObject* WorldContextObject,
+	EEnemyType EnemyType, int32 Level)
+{
+	UEnemiesData* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
+	if (CharacterClassInfo == nullptr) return 0;
+	const FEnemyDefaultStats& Info = CharacterClassInfo->GetClassDefaultInfo(EnemyType);
+	const float XPReward = Info.ExperiencePointsReward.GetValueAtLevel(Level);
+	return static_cast<int32>(XPReward);
 }

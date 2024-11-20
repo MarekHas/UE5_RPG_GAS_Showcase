@@ -110,4 +110,5 @@ void AFFS_CharacterBase::AddCharacterAbilities()
 	if (!HasAuthority()) return;
 
 	FFS_AbilitySystemComponent->AddCharacterAbilities(StartupAbilities);
+	FFS_AbilitySystemComponent->AddPassiveAbilities(InitialPassiveAbilities);
 }

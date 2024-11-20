@@ -144,6 +144,12 @@ void FFFS_GameplayTags::InitializeNativeGameplayTags()
 		FString("Resistance to Physical damage")
 		);
 
+	//Game Event Attributes
+	GameplayTags.Attribute_GameEvent_ExperienceReceived = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Attribute.GameEvent.ExperienceReceived"),
+	FString("Received experience points for killing enemy")
+	);
+
 	//Map Damage types to resistance
 	GameplayTags.DamageTypeToResistanceType.Add(GameplayTags.PhysicalDamage, GameplayTags.Attribute_Resistance_Physical);
 	GameplayTags.DamageTypeToResistanceType.Add(GameplayTags.FireDamage, GameplayTags.Attribute_Resistance_Fire);
