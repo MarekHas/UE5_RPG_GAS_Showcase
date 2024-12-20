@@ -66,10 +66,7 @@ protected:
 	TSubclassOf<UGameplayEffect> InitialBaseStats;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> InitialDerivedStats;
-
-	UPROPERTY(EditAnywhere, Category = "Abilities")
-	TArray<TSubclassOf<UGameplayAbility>> InitialPassiveAbilities;
-
+	
 	virtual void InitAbilityActorInfo();
 	virtual void InitDefaultStats() const;
 
@@ -79,6 +76,8 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> InitialPassiveAbilities;
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
 };

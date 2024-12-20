@@ -23,6 +23,10 @@ public:
 	void AddPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilities);
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
+
+	void UpgradeSkill(const FGameplayTag& AttributeTag);
+	UFUNCTION(Server, Reliable)
+	void Server_UpgradeSkill(const FGameplayTag& AttributeTag);
 protected:
 	UFUNCTION(Client, Reliable)
 	void Client_OnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);

@@ -2,7 +2,10 @@
 
 
 #include "AbilitySystem/FFS_AbilitySystemComponent.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/FFS_GameplayAbility.h"
+#include "Interfaces/PlayerInterface.h"
 
 //This function should be called affter InitAbilityActorInfo 
 void UFFS_AbilitySystemComponent::BindToAbilitySystemDelegates()
@@ -58,6 +61,30 @@ void UFFS_AbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& In
 		{
 			AbilitySpecInputReleased(AbilitySpec);
 		}
+	}
+}
+
+void UFFS_AbilitySystemComponent::UpgradeSkill(const FGameplayTag& AttributeTag)
+{
+	if (GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		if (IPlayerInterface::Execute_GetSkillPoints(GetAvatarActor()) > 0)
+		{
+			Server_UpgradeSkill(AttributeTag);
+		}
+	}
+}
+
+void UFFS_AbilitySystemComponent::Server_UpgradeSkill_Implementation(const FGameplayTag& AttributeTag)
+{
+	FGameplayEventData Payload;
+	Payload.EventTag = AttributeTag;
+	Payload.EventMagnitude = 1.f;
+	
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(), AttributeTag, Payload);
+	if (GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		IPlayerInterface::Execute_AddSkillPoints(GetAvatarActor(),-1);
 	}
 }
 

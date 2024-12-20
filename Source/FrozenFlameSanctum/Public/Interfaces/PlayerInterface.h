@@ -24,7 +24,6 @@ class FROZENFLAMESANCTUM_API IPlayerInterface
 public:
 	UFUNCTION(BlueprintNativeEvent)
 	void LevelUp();
-	
 	UFUNCTION(BlueprintNativeEvent)
 	void AddPlayerLevel(int32 InPlayerLevel);
 	UFUNCTION(BlueprintNativeEvent)
@@ -33,7 +32,11 @@ public:
 	void AddSkillPoints(int32 InSkillPoints);
 	UFUNCTION(BlueprintNativeEvent)
 	void AddSpellPoints(int32 InSpellPoints);
-	
+
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetSkillPoints() const;
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetSpellPoints() const;
 	UFUNCTION(BlueprintNativeEvent)
 	int32 CheckLevelForGivenExperience(int32 InExperiencePoints) const;
 	UFUNCTION(BlueprintNativeEvent)

@@ -28,12 +28,12 @@ public:
 	virtual void OnRep_PlayerState() override;
 
 	/** Player Interface */
-	virtual void AddExperiencePoints_Implementation(int32 InExperiencePoints) override;
 	virtual void LevelUp_Implementation() override;
-
-	
+	virtual void AddExperiencePoints_Implementation(int32 InExperiencePoints) override;
 	virtual int32 CheckLevelForGivenExperience_Implementation(int32 InExperiencePoints) const override;
-	
+
+	virtual int32 GetSkillPoints_Implementation() const override;
+	virtual int32 GetSpellPoints_Implementation() const override;
 	virtual int32 GetExperiencePoints_Implementation() const override;
 	virtual int32 GetSkillPointsReceived_Implementation(int32 Level) const override;
 	virtual int32 GetSpellPointsReceived_Implementation(int32 Level) const override;

@@ -23,6 +23,8 @@ void AFFS_PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(AFFS_PlayerState, PlayerLevel);
 	DOREPLIFETIME(AFFS_PlayerState, ExperiencePoints);
+	DOREPLIFETIME(AFFS_PlayerState, SkillPoints);
+	DOREPLIFETIME(AFFS_PlayerState, SpellPoints);
 }
 
 void AFFS_PlayerState::OnRep_Level(int32 OldLevel)
@@ -33,6 +35,16 @@ void AFFS_PlayerState::OnRep_Level(int32 OldLevel)
 void AFFS_PlayerState::OnRep_ExperiencePoints(int32 OldExperiencePoints)
 {
 	OnExperiencePointsChangedDelegate.Broadcast(OldExperiencePoints);
+}
+
+void AFFS_PlayerState::OnRep_SkillPoints(int32 OldSkillPoints)
+{
+	OnSkillPointsChangedDelegate.Broadcast(SkillPoints);
+}
+
+void AFFS_PlayerState::OnRep_SpellPoints(int32 OldSpellPoints)
+{
+	OnSpellPointsChangedDelegate.Broadcast(SpellPoints);
 }
 
 void AFFS_PlayerState::SetupAbilitySystemComponent()
@@ -59,6 +71,18 @@ void AFFS_PlayerState::SetExperiencePoints(const int32 InPoints)
 {
 	ExperiencePoints = InPoints;
 	OnExperiencePointsChangedDelegate.Broadcast(ExperiencePoints);
+}
+
+void AFFS_PlayerState::AddSkillPoints(int32 InPoints)
+{
+	SkillPoints += InPoints;
+	OnSkillPointsChangedDelegate.Broadcast(SkillPoints);
+}
+
+void AFFS_PlayerState::AddSpellPoints(int32 InPoints)
+{
+	SpellPoints += InPoints;
+	OnSpellPointsChangedDelegate.Broadcast(SpellPoints);
 }
 
 void AFFS_PlayerState::LevelUp(const int32 InLevel)

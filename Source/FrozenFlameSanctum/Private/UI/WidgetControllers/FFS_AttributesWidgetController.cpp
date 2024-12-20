@@ -4,8 +4,8 @@
 #include "UI/WidgetControllers/FFS_AttributesWidgetController.h"
 #include "AbilitySystem/FFS_AttributeSet.h"
 #include "FFS_GameplayTags.h"
+#include "AbilitySystem/FFS_AbilitySystemComponent.h"
 #include "AbilitySystem/Data/AttributeInfo.h"
-#include "AbilitySystem/FFS_AttributeSet.h"
 
 void UFFS_AttributesWidgetController::BindCallbacksToDependencies()
 {
@@ -20,6 +20,14 @@ void UFFS_AttributesWidgetController::BindCallbacksToDependencies()
 			}
 		);
 	}
+
+	AFFS_PlayerState* FFS_PlayerState = CastChecked<AFFS_PlayerState>(PlayerState);
+	FFS_PlayerState->OnSkillPointsChangedDelegate.AddLambda(
+		[this](int32 Points)
+		{
+			SkillPointsChangedDelegate.Broadcast(Points);
+		}
+	);
 }
 
 void UFFS_AttributesWidgetController::BroadcastInitialValues()
@@ -32,6 +40,15 @@ void UFFS_AttributesWidgetController::BroadcastInitialValues()
 	{
 		BroadcastAttributeInfo(Pair.Key, Pair.Value());
 	}
+	
+	AFFS_PlayerState* FFS_PlayerState = CastChecked<AFFS_PlayerState>(PlayerState);
+	SkillPointsChangedDelegate.Broadcast(FFS_PlayerState->GetSkillPoints());
+}
+
+void UFFS_AttributesWidgetController::UpgradeSkill(const FGameplayTag& AttributeTag)
+{
+	UFFS_AbilitySystemComponent* FFS_AbilitySystemComponent = CastChecked<UFFS_AbilitySystemComponent>(AbilitySystemComponent);
+	FFS_AbilitySystemComponent->UpgradeSkill(AttributeTag);
 }
 
 void UFFS_AttributesWidgetController::BroadcastAttributeInfo(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute) const

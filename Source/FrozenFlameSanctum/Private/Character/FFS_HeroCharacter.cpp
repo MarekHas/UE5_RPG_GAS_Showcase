@@ -64,6 +64,20 @@ int32 AFFS_HeroCharacter::CheckLevelForGivenExperience_Implementation(int32 InEx
 	return FFS_PlayerState->CharacterProgressData->GetCharacterLevel(InExperiencePoints);
 }
 
+int32 AFFS_HeroCharacter::GetSkillPoints_Implementation() const
+{
+	const AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
+	check(FFS_PlayerState);
+	return FFS_PlayerState->GetSkillPoints();
+}
+
+int32 AFFS_HeroCharacter::GetSpellPoints_Implementation() const
+{
+	const AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
+	check(FFS_PlayerState);
+	return FFS_PlayerState->GetSpellPoints();
+}
+
 int32 AFFS_HeroCharacter::GetExperiencePoints_Implementation() const
 {
 	const AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
@@ -94,12 +108,17 @@ void AFFS_HeroCharacter::AddPlayerLevel_Implementation(int32 InPlayerLevel)
 
 void AFFS_HeroCharacter::AddSkillPoints_Implementation(int32 InSkillPoints)
 {
-	//IPlayerInterface::AddSkillPoints_Implementation(InSkillPoints);
+	AFFS_PlayerState* AuraPlayerState = GetPlayerState<AFFS_PlayerState>();
+	check(AuraPlayerState);
+	AuraPlayerState->AddSkillPoints(InSkillPoints);
 }
 
 void AFFS_HeroCharacter::AddSpellPoints_Implementation(int32 InSpellPoints)
 {
-	//IPlayerInterface::AddSpellPoints_Implementation(InSpellPoints);
+	AFFS_PlayerState* AuraPlayerState = GetPlayerState<AFFS_PlayerState>();
+	check(AuraPlayerState);
+	
+	AuraPlayerState->AddSpellPoints(InSpellPoints);
 }
 
 int32 AFFS_HeroCharacter::GetPlayerLevel_Implementation()
