@@ -84,8 +84,10 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
 	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
+
 #pragma region Basic stats properties
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Basic Attributes")
 	FGameplayAttributeData Health;
@@ -243,4 +245,6 @@ private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProperties) const;
 	void ShowDamageText(const FEffectProperties& EffectProperties, const float Damage, bool bBlockedHit, bool bCriticalHit) const;
 	void SendExperiencePointsReceivedEvent(const FEffectProperties& EffectProperties);
+	bool bIsNewMaxHealthToSet = false;
+	bool bIsNewMaxManaToSet = false;
 };

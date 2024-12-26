@@ -263,15 +263,30 @@ void UFFS_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				IPlayerInterface::Execute_AddPlayerLevel(EffectProperties.SourceCharacter, NumLevelUps);
 				IPlayerInterface::Execute_AddSkillPoints(EffectProperties.SourceCharacter, SkillPointsReceived);
 				IPlayerInterface::Execute_AddSpellPoints(EffectProperties.SourceCharacter, SpellPointsReceived);
-	
-				SetHealth(GetMaxHealth());
-				SetMana(GetMaxMana());
-				
+
+				bIsNewMaxHealthToSet = true;
+				bIsNewMaxManaToSet = true;
+
 				IPlayerInterface::Execute_LevelUp(EffectProperties.SourceCharacter);
 			}
 			
 			IPlayerInterface::Execute_AddExperiencePoints(EffectProperties.SourceCharacter, 50);
 		}
+	}
+}
+
+void UFFS_AttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+	if (Attribute == GetMaxHealthAttribute() && bIsNewMaxHealthToSet)
+	{
+		SetHealth(GetMaxHealth());
+		bIsNewMaxHealthToSet = false;
+	}
+	if (Attribute == GetMaxManaAttribute() && bIsNewMaxManaToSet)
+	{
+		SetMana(GetMaxMana());
+		bIsNewMaxManaToSet = false;
 	}
 }
 
