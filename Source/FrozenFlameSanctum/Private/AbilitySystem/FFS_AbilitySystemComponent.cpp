@@ -25,6 +25,9 @@ void UFFS_AbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf
 			GiveAbility(AbilitySpec);
 		}
 	}
+	
+	bStartupAbilitiesGranted = true;
+	OnAbilitiesGrantedDelegate.Broadcast(this);
 }
 
 void UFFS_AbilitySystemComponent::AddPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilities)
@@ -64,6 +67,45 @@ void UFFS_AbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& In
 	}
 }
 
+void UFFS_AbilitySystemComponent::OnAbilityGiven(const FOnAbilityGiven& Delegate)
+{
+	FScopedAbilityListLock ActiveScopeLock(*this);
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (!Delegate.ExecuteIfBound(AbilitySpec))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to execute delegate in %hs"), __FUNCTION__);
+		}
+	}
+}
+
+FGameplayTag UFFS_AbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	if (AbilitySpec.Ability)
+	{
+		for (FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags)
+		{
+			if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Ability"))))
+			{
+				return Tag;
+			}
+		}
+	}
+	return FGameplayTag();
+}
+
+FGameplayTag UFFS_AbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Input"))))
+		{
+			return Tag;
+		}
+	}
+	return FGameplayTag();
+}
+
 void UFFS_AbilitySystemComponent::UpgradeSkill(const FGameplayTag& AttributeTag)
 {
 	if (GetAvatarActor()->Implements<UPlayerInterface>())
@@ -72,6 +114,16 @@ void UFFS_AbilitySystemComponent::UpgradeSkill(const FGameplayTag& AttributeTag)
 		{
 			Server_UpgradeSkill(AttributeTag);
 		}
+	}
+}
+
+void UFFS_AbilitySystemComponent::OnRep_ActivateAbilities()
+{
+	Super::OnRep_ActivateAbilities();
+	if (!bStartupAbilitiesGranted)
+	{
+		bStartupAbilitiesGranted = true;
+		OnAbilitiesGrantedDelegate.Broadcast(this);
 	}
 }
 

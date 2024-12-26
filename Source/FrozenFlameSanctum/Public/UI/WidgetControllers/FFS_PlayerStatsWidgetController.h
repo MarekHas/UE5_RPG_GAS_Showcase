@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/AbilitiesInfo.h"
 #include "UI/WidgetControllers/FFS_WidgetController.h"
 #include "FFS_PlayerStatsWidgetController.generated.h"
 
-
+class UFFS_AbilitySystemComponent;
+struct FFFS_AbilityInfo;
 
 USTRUCT(BlueprintType)
 struct FNotificationWidgetRow : public FTableRowBase
@@ -31,6 +33,7 @@ class UFFS_UserWidget;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerLevelChangedSignature, int32, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatsChangedSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationSignature, FNotificationWidgetRow, Notification);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityInfoFoundSignature, const FFFS_AbilityInfo&, Info);
 
 /**
  * 
@@ -63,12 +66,16 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category = "Notifications")
 	FOnNotificationSignature OnNotificationDelegate;
-
+	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
+	FOnAbilityInfoFoundSignature OnAbilityInfoFoundDelegate;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Notifications")
 	TObjectPtr<UDataTable> NotificationWidgetsDataTable;
-
-	//void OnInitializeStartupAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
+	TObjectPtr<UAbilitiesInfo> AbilitiesInfo;
+	
+	void OnInitializeStartupAbilities(UFFS_AbilitySystemComponent* FFS_AbilitySystemComponent);
 	void OnExperiencePointsChanged(int32 NewExperiencePoints) const;
 
 	template<typename T>

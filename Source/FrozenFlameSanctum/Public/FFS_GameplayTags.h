@@ -56,6 +56,9 @@ public:
 
 	FGameplayTag Ability_Attack;
 	
+	FGameplayTag Ability_Fire_FireBolt;
+
+	FGameplayTag Cooldown_Fire_FireBolt;
 	TMap<FGameplayTag, FGameplayTag> DamageTypeToResistanceType;
 protected:
 private:

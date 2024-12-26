@@ -163,8 +163,22 @@ void FFFS_GameplayTags::InitializeNativeGameplayTags()
 		FName("Ability.Attack"),
 		FString("Attack Ability Tag")
 		);
+
+	GameplayTags.Ability_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Fire.FireBolt"),
+		FString("FireBolt Ability Tag")
+		);
+	
 	GameplayTags.HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("HitReact"),
 		FString("React to being hit")
 	);
+
+	/*
+	* Cooldown
+	*/
+	GameplayTags.Cooldown_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Fire.FireBolt"),
+		FString("Cooldown Tag for FireBolt ability")
+		);
 }

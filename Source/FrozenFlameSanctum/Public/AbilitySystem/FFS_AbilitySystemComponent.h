@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
+
 #include "FFS_AbilitySystemComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEffectAppliedSignature, const FGameplayTagContainer&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnAbilitiesGrantedSignature, UFFS_AbilitySystemComponent*);
+DECLARE_DELEGATE_OneParam(FOnAbilityGiven, const FGameplayAbilitySpec&);
 /**
  * 
  */
@@ -16,18 +19,28 @@ class FROZENFLAMESANCTUM_API UFFS_AbilitySystemComponent : public UAbilitySystem
 	GENERATED_BODY()
 
 public:
+	FOnEffectAppliedSignature OnEffectAppliedDelegate;
+	FOnAbilitiesGrantedSignature OnAbilitiesGrantedDelegate;
+	
 	//This function should be called affter InitAbilityActorInfo 
 	void BindToAbilitySystemDelegates();
-	FOnEffectAppliedSignature OnEffectAppliedDelegate;
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 	void AddPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilities);
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 
+	void OnAbilityGiven(const FOnAbilityGiven& Delegate);
+	
+	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	
 	void UpgradeSkill(const FGameplayTag& AttributeTag);
 	UFUNCTION(Server, Reliable)
 	void Server_UpgradeSkill(const FGameplayTag& AttributeTag);
+
+	bool bStartupAbilitiesGranted = false;
 protected:
+	virtual void OnRep_ActivateAbilities() override;
 	UFUNCTION(Client, Reliable)
 	void Client_OnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 
