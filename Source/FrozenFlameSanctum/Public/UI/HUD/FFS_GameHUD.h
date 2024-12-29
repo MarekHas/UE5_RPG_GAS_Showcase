@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "FFS_GameHUD.generated.h"
 
+class UFFS_SkillMenuWidgetController;
 class UAbilitySystemComponent;
 class UAttributeSet;
 class UFFS_UserWidget;
@@ -23,7 +24,8 @@ class FROZENFLAMESANCTUM_API AFFS_GameHUD : public AHUD
 
 public:
 	UFFS_PlayerStatsWidgetController* GetWidgetControllerParams(const FWidgetControllerParams& WidgetControllerParams);
-	UFFS_AttributesWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams);
+	UFFS_AttributesWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParams& WidgetControllerParams);
+	UFFS_SkillMenuWidgetController* GetSkillMenuWidgetController(const FWidgetControllerParams& WidgetControllerParams);
 
 	void InitWidget(APlayerController* InController, APlayerState* InState, UAbilitySystemComponent* InAbilitySystem, UAttributeSet* InAttribute);
 
@@ -42,4 +44,9 @@ private:
 	TObjectPtr<UFFS_AttributesWidgetController> AttributeMenuWidgetController;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UFFS_AttributesWidgetController> AttributeMenuWidgetControllerClass;
+
+	UPROPERTY()
+	TObjectPtr<UFFS_SkillMenuWidgetController> SkillMenuWidgetController;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UFFS_SkillMenuWidgetController> SkillMenuWidgetControllerClass;
 };

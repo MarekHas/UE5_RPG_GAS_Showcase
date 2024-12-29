@@ -9,6 +9,9 @@
 
 #include "FFS_AbilityBlueprintLibrary.generated.h"
 
+struct FWidgetControllerParams;
+class UFFS_SkillMenuWidgetController;
+class AFFS_GameHUD;
 class UFFS_PlayerStatsWidgetController;
 class UFFS_AttributesWidgetController;
 /**
@@ -19,12 +22,17 @@ class FROZENFLAMESANCTUM_API UFFS_AbilityBlueprintLibrary : public UBlueprintFun
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintPure, Category = "FFS_AbilityBlueprintLibrary|WidgetController")
+	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	static bool MakeWidgetControllerParams(const UObject* WorldContextObject,
+		FWidgetControllerParams& OutWidgetControllerParams,AFFS_GameHUD*& OutGameHUD);
+	
+	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static UFFS_PlayerStatsWidgetController* GetWidgetController(const UObject* WorldContextObject);
-
-	UFUNCTION(BlueprintPure, Category = "FFS_AbilityBlueprintLibrary|WidgetController")
+	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static UFFS_AttributesWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
-
+	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	static UFFS_SkillMenuWidgetController* GetSkillMenuWidgetController(const UObject* WorldContextObject);
+	
 	UFUNCTION(BlueprintCallable, Category = "FFS_AbilityBlueprintLibrary|EnemyType")
 	static void InitializeDefaultAttributes(const UObject* WorldContextObject, EEnemyType EnemyType, 
 		float Level, UAbilitySystemComponent* AbilitySystemComponent);

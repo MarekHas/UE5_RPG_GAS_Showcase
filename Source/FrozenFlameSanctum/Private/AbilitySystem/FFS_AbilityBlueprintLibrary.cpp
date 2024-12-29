@@ -15,36 +15,62 @@
 #include "AbilitySystem/Data/EnemiesData.h"
 #include "Interfaces/CombatInterface.h"
 
-UFFS_PlayerStatsWidgetController* UFFS_AbilityBlueprintLibrary::GetWidgetController(const UObject* WorldContextObject)
+bool UFFS_AbilityBlueprintLibrary::MakeWidgetControllerParams(const UObject* WorldContextObject,
+	FWidgetControllerParams& OutWidgetControllerParams, AFFS_GameHUD*& OutGameHUD)
 {
 	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
 	{
-		if (AFFS_GameHUD* GameHUD = Cast<AFFS_GameHUD>(PlayerController->GetHUD()))
+		OutGameHUD = Cast<AFFS_GameHUD>(PlayerController->GetHUD());
+		if (OutGameHUD)
 		{
 			AFFS_PlayerState* PlayerState = PlayerController->GetPlayerState<AFFS_PlayerState>();
-			UAbilitySystemComponent* AbilitySystem = PlayerState->GetAbilitySystemComponent();
-			UAttributeSet* Attributes = PlayerState->GetAttributeSet();
-			const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState, AbilitySystem, Attributes);
+			UAbilitySystemComponent* AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
+			UAttributeSet* AttributeSet = PlayerState->GetAttributeSet();
+			
+			OutWidgetControllerParams.PlayerController = PlayerController;
+			OutWidgetControllerParams.PlayerState = PlayerState;
+			OutWidgetControllerParams.AbilitySystemComponent = AbilitySystemComponent;
+			OutWidgetControllerParams.AttributeSet = AttributeSet;
 
-			return GameHUD->GetWidgetControllerParams(WidgetControllerParams);
+			return true;
 		}
+	}
+	return false;
+}
+
+UFFS_PlayerStatsWidgetController* UFFS_AbilityBlueprintLibrary::GetWidgetController(const UObject* WorldContextObject)
+{
+	FWidgetControllerParams WidgetControllerParams;
+	AFFS_GameHUD* GameHUD = nullptr;
+	
+	if (MakeWidgetControllerParams(WorldContextObject, WidgetControllerParams, GameHUD))
+	{
+		return GameHUD->GetWidgetControllerParams(WidgetControllerParams);
 	}
 	return nullptr;
 }
 
 UFFS_AttributesWidgetController* UFFS_AbilityBlueprintLibrary::GetAttributeMenuWidgetController(const UObject* WorldContextObject)
 {
-	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	FWidgetControllerParams WidgetControllerParams;
+	AFFS_GameHUD* GameHUD = nullptr;
+    	
+	if (MakeWidgetControllerParams(WorldContextObject, WidgetControllerParams, GameHUD))
 	{
-		if (AFFS_GameHUD* GameHUD = Cast<AFFS_GameHUD>(PlayerController->GetHUD()))
-		{
-			AFFS_PlayerState* PlayerState = PlayerController->GetPlayerState<AFFS_PlayerState>();
-			UAbilitySystemComponent* AbilitySystem = PlayerState->GetAbilitySystemComponent();
-			UAttributeSet* Attributes = PlayerState->GetAttributeSet();
-			const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState, AbilitySystem, Attributes);
+		return GameHUD->GetAttributeMenuWidgetController(WidgetControllerParams);
+	}
+	return nullptr;
+}
 
-			return GameHUD->GetAttributeMenuWidgetController(WidgetControllerParams);
-		}
+UFFS_SkillMenuWidgetController* UFFS_AbilityBlueprintLibrary::GetSkillMenuWidgetController(
+	const UObject* WorldContextObject)
+{
+	FWidgetControllerParams WidgetControllerParams;
+	AFFS_GameHUD* GameHUD = nullptr;
+    	
+	if (MakeWidgetControllerParams(WorldContextObject, WidgetControllerParams, GameHUD))
+	{
+		return GameHUD->GetSkillMenuWidgetController(WidgetControllerParams);
 	}
 	return nullptr;
 }

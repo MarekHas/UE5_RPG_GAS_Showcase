@@ -5,6 +5,7 @@
 #include "UI/Widgets/FFS_UserWidget.h"
 #include "UI/WidgetControllers/FFS_PlayerStatsWidgetController.h"
 #include "UI/WidgetControllers/FFS_AttributesWidgetController.h"
+#include "UI/WidgetControllers/FFS_SkillMenuWidgetController.h"
 
 UFFS_PlayerStatsWidgetController* AFFS_GameHUD::GetWidgetControllerParams(const FWidgetControllerParams& WidgetControllerParams)
 {
@@ -18,16 +19,28 @@ UFFS_PlayerStatsWidgetController* AFFS_GameHUD::GetWidgetControllerParams(const 
 	return PlayerStatsWidgetController;
 }
 
-UFFS_AttributesWidgetController* AFFS_GameHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+UFFS_AttributesWidgetController* AFFS_GameHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WidgetControllerParams)
 {
 	if (AttributeMenuWidgetController == nullptr)
 	{
 		AttributeMenuWidgetController = NewObject<UFFS_AttributesWidgetController>(this, AttributeMenuWidgetControllerClass);
 		
-		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+		AttributeMenuWidgetController->SetWidgetControllerParams(WidgetControllerParams);
 		AttributeMenuWidgetController->BindCallbacksToDependencies();
 	}
 	return AttributeMenuWidgetController;
+}
+
+UFFS_SkillMenuWidgetController* AFFS_GameHUD::GetSkillMenuWidgetController(
+	const FWidgetControllerParams& WidgetControllerParams)
+{
+	if (SkillMenuWidgetController == nullptr)
+	{
+		SkillMenuWidgetController = NewObject<UFFS_SkillMenuWidgetController>(this, SkillMenuWidgetControllerClass);
+		SkillMenuWidgetController->SetWidgetControllerParams(WidgetControllerParams);
+		SkillMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return SkillMenuWidgetController;
 }
 
 void AFFS_GameHUD::InitWidget(APlayerController* InController, APlayerState* InState, UAbilitySystemComponent* InAbilitySystem, UAttributeSet* InAttribute)
