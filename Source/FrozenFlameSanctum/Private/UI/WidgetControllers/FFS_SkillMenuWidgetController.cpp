@@ -6,6 +6,7 @@
 void UFFS_SkillMenuWidgetController::BroadcastInitialValues()
 {
 	Super::BroadcastInitialValues();
+	AbilityInfoBroadcast();
 }
 
 void UFFS_SkillMenuWidgetController::BindCallbacksToDependencies()
