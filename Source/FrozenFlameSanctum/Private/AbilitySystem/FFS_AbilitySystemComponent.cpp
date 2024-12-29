@@ -27,7 +27,7 @@ void UFFS_AbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf
 	}
 	
 	bStartupAbilitiesGranted = true;
-	OnAbilitiesGrantedDelegate.Broadcast(this);
+	OnAbilitiesGrantedDelegate.Broadcast();
 }
 
 void UFFS_AbilitySystemComponent::AddPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilities)
@@ -123,7 +123,7 @@ void UFFS_AbilitySystemComponent::OnRep_ActivateAbilities()
 	if (!bStartupAbilitiesGranted)
 	{
 		bStartupAbilitiesGranted = true;
-		OnAbilitiesGrantedDelegate.Broadcast(this);
+		OnAbilitiesGrantedDelegate.Broadcast();
 	}
 }
 

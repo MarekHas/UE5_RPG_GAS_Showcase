@@ -8,7 +8,7 @@
 #include "FFS_AbilitySystemComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEffectAppliedSignature, const FGameplayTagContainer&);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnAbilitiesGrantedSignature, UFFS_AbilitySystemComponent*);
+DECLARE_MULTICAST_DELEGATE(FOnAbilitiesGrantedSignature);
 DECLARE_DELEGATE_OneParam(FOnAbilityGiven, const FGameplayAbilitySpec&);
 /**
  * 

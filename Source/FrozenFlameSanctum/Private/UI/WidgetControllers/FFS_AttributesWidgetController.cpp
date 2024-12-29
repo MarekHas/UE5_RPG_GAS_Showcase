@@ -9,9 +9,8 @@
 
 void UFFS_AttributesWidgetController::BindCallbacksToDependencies()
 {
-	UFFS_AttributeSet* AS = CastChecked<UFFS_AttributeSet>(AttributeSet);
 	check(AttributeInfo);
-	for (auto& Pair : AS->TagsToAttributes)
+	for (auto& Pair : GetFFSAttributeSet()->TagsToAttributes)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
 			[this, Pair](const FOnAttributeChangeData& Data)
@@ -21,8 +20,8 @@ void UFFS_AttributesWidgetController::BindCallbacksToDependencies()
 		);
 	}
 
-	AFFS_PlayerState* FFS_PlayerState = CastChecked<AFFS_PlayerState>(PlayerState);
-	FFS_PlayerState->OnSkillPointsChangedDelegate.AddLambda(
+
+	GetFFSPlayerState()->OnSkillPointsChangedDelegate.AddLambda(
 		[this](int32 Points)
 		{
 			SkillPointsChangedDelegate.Broadcast(Points);
@@ -32,23 +31,19 @@ void UFFS_AttributesWidgetController::BindCallbacksToDependencies()
 
 void UFFS_AttributesWidgetController::BroadcastInitialValues()
 {
-	UFFS_AttributeSet* Attribute = CastChecked<UFFS_AttributeSet>(AttributeSet);
-
 	check(AttributeInfo);
 
-	for (auto& Pair : Attribute->TagsToAttributes) 
+	for (auto& Pair : GetFFSAttributeSet()->TagsToAttributes) 
 	{
 		BroadcastAttributeInfo(Pair.Key, Pair.Value());
 	}
 	
-	AFFS_PlayerState* FFS_PlayerState = CastChecked<AFFS_PlayerState>(PlayerState);
-	SkillPointsChangedDelegate.Broadcast(FFS_PlayerState->GetSkillPoints());
+	SkillPointsChangedDelegate.Broadcast(GetFFSPlayerState()->GetSkillPoints());
 }
 
 void UFFS_AttributesWidgetController::UpgradeSkill(const FGameplayTag& AttributeTag)
 {
-	UFFS_AbilitySystemComponent* FFS_AbilitySystemComponent = CastChecked<UFFS_AbilitySystemComponent>(AbilitySystemComponent);
-	FFS_AbilitySystemComponent->UpgradeSkill(AttributeTag);
+	GetFFSAbilitySystemComponent()->UpgradeSkill(AttributeTag);
 }
 
 void UFFS_AttributesWidgetController::BroadcastAttributeInfo(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute) const

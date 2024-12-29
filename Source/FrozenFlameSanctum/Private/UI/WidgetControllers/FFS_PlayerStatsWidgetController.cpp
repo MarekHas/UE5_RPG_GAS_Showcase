@@ -9,47 +9,43 @@
 
 void UFFS_PlayerStatsWidgetController::BroadcastInitialValues()
 {
-	const UFFS_AttributeSet* FFS_AttributeSet = CastChecked<UFFS_AttributeSet>(AttributeSet);
-
-	OnHealthChangedDelegate.Broadcast(FFS_AttributeSet->GetHealth());
-	OnMaxHealthChangedDelegate.Broadcast(FFS_AttributeSet->GetMaxHealth());
-	OnManaChangedDelegate.Broadcast(FFS_AttributeSet->GetMana());
-	OnMaxManaChangedDelegate.Broadcast(FFS_AttributeSet->GetMaxMana());
+	OnHealthChangedDelegate.Broadcast(GetFFSAttributeSet()->GetHealth());
+	OnMaxHealthChangedDelegate.Broadcast(GetFFSAttributeSet()->GetMaxHealth());
+	OnManaChangedDelegate.Broadcast(GetFFSAttributeSet()->GetMana());
+	OnMaxManaChangedDelegate.Broadcast(GetFFSAttributeSet()->GetMaxMana());
 }
 
 void UFFS_PlayerStatsWidgetController::BindCallbacksToDependencies()
 {
-	AFFS_PlayerState* FFS_PlayerState = CastChecked<AFFS_PlayerState>(PlayerState);
-	FFS_PlayerState->OnExperiencePointsChangedDelegate.AddUObject(this, &UFFS_PlayerStatsWidgetController::OnExperiencePointsChanged);
-	FFS_PlayerState->OnPlayerLevelChangedDelegate.AddLambda(
+	GetFFSPlayerState()->OnExperiencePointsChangedDelegate.AddUObject(this, &UFFS_PlayerStatsWidgetController::OnExperiencePointsChanged);
+	GetFFSPlayerState()->OnPlayerLevelChangedDelegate.AddLambda(
 		[this](int32 NewLevel){OnPlayerLevelChangedDelegate.Broadcast(NewLevel);});
 	
-	const UFFS_AttributeSet* FFS_AttributeSet = CastChecked<UFFS_AttributeSet>(AttributeSet);
 	//Player Stats delegates
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		FFS_AttributeSet->GetHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnHealthChangedDelegate.Broadcast(Data.NewValue); });
+		GetFFSAttributeSet()->GetHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnHealthChangedDelegate.Broadcast(Data.NewValue); });
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		FFS_AttributeSet->GetMaxHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnMaxHealthChangedDelegate.Broadcast(Data.NewValue); });
+		GetFFSAttributeSet()->GetMaxHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnMaxHealthChangedDelegate.Broadcast(Data.NewValue); });
 	
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		FFS_AttributeSet->GetManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnManaChangedDelegate.Broadcast(Data.NewValue); });
+		GetFFSAttributeSet()->GetManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnManaChangedDelegate.Broadcast(Data.NewValue); });
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		FFS_AttributeSet->GetMaxManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnMaxManaChangedDelegate.Broadcast(Data.NewValue); });
+		GetFFSAttributeSet()->GetMaxManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data) {OnMaxManaChangedDelegate.Broadcast(Data.NewValue); });
 
-	if(UFFS_AbilitySystemComponent* FFS_AbilitySystemComponent = Cast<UFFS_AbilitySystemComponent>(AbilitySystemComponent))
+	if(GetFFSAbilitySystemComponent())
 	{
-		if(FFS_AbilitySystemComponent->bStartupAbilitiesGranted)
+		if(GetFFSAbilitySystemComponent()->bStartupAbilitiesGranted)
 		{
-			OnInitializeStartupAbilities(FFS_AbilitySystemComponent);
+			AbilityInfoBroadcast();
 		}
 		else
 		{
-			FFS_AbilitySystemComponent->OnAbilitiesGrantedDelegate.AddUObject(this,&UFFS_PlayerStatsWidgetController::OnInitializeStartupAbilities);	
+			GetFFSAbilitySystemComponent()->OnAbilitiesGrantedDelegate.AddUObject(this,&UFFS_WidgetController::AbilityInfoBroadcast);	
 		}
 
-		FFS_AbilitySystemComponent->OnEffectAppliedDelegate.AddLambda(
+		GetFFSAbilitySystemComponent()->OnEffectAppliedDelegate.AddLambda(
 			[this](const FGameplayTagContainer& AssetTags)
 			{
 				for (const FGameplayTag& Tag : AssetTags)
@@ -78,7 +74,7 @@ void UFFS_PlayerStatsWidgetController::BindCallbacksToDependencies()
 	}
 	
 	//Notification about effect applied delegate
-	Cast<UFFS_AbilitySystemComponent>(AbilitySystemComponent)->OnEffectAppliedDelegate.AddLambda(
+	GetFFSAbilitySystemComponent()->OnEffectAppliedDelegate.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 		{
 			for (const FGameplayTag& Tag : AssetTags)
@@ -105,25 +101,9 @@ void UFFS_PlayerStatsWidgetController::BindCallbacksToDependencies()
 	);
 }
 
-void UFFS_PlayerStatsWidgetController::OnInitializeStartupAbilities(
-	UFFS_AbilitySystemComponent* FFS_AbilitySystemComponent)
+void UFFS_PlayerStatsWidgetController::OnExperiencePointsChanged(int32 NewExperiencePoints)
 {
-	if (!FFS_AbilitySystemComponent->bStartupAbilitiesGranted) return;
-
-	FOnAbilityGiven BroadcastDelegate;
-	BroadcastDelegate.BindLambda([this, FFS_AbilitySystemComponent](const FGameplayAbilitySpec& AbilitySpec)
-	{
-		FFFS_AbilityInfo Info = AbilitiesInfo->FindAbilityInfoForTag(FFS_AbilitySystemComponent->GetAbilityTagFromSpec(AbilitySpec));
-		Info.InputTag = FFS_AbilitySystemComponent->GetInputTagFromSpec(AbilitySpec);
-		OnAbilityInfoFoundDelegate.Broadcast(Info);
-	});
-	FFS_AbilitySystemComponent->OnAbilityGiven(BroadcastDelegate);
-}
-
-void UFFS_PlayerStatsWidgetController::OnExperiencePointsChanged(int32 NewExperiencePoints) const
-{
-	AFFS_PlayerState* FFS_PlayerState = CastChecked<AFFS_PlayerState>(PlayerState);
-	UCharacterProgressData* ProgressData = FFS_PlayerState->CharacterProgressData;
+	UCharacterProgressData* ProgressData = GetFFSPlayerState()->CharacterProgressData;
 
 	checkf(ProgressData, TEXT("Unable to find ProgressData. Missing on PlayerState Blueprint"));
 
