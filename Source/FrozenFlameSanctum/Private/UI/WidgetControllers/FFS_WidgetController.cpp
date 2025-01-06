@@ -34,6 +34,7 @@ void UFFS_WidgetController::AbilityInfoBroadcast()
 	{
 		FFFS_AbilityInfo Info = AbilitiesInfo->FindAbilityInfoForTag(FFS_AbilitySystemComponent->GetAbilityTagFromSpec(AbilitySpec));
 		Info.InputTag = FFS_AbilitySystemComponent->GetInputTagFromSpec(AbilitySpec);
+		Info.StateTag = FFS_AbilitySystemComponent->GetAbilityStateFromSpec(AbilitySpec);
 		OnAbilityInfoFoundDelegate.Broadcast(Info);
 	});
 	GetFFSAbilitySystemComponent()->OnAbilityGiven(BroadcastDelegate);

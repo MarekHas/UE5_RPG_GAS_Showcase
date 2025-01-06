@@ -4,7 +4,10 @@
 #include "AbilitySystem/FFS_AbilitySystemComponent.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "FFS_GameplayTags.h"
+#include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
 #include "AbilitySystem/FFS_GameplayAbility.h"
+#include "AbilitySystem/Data/AbilitiesInfo.h"
 #include "Interfaces/PlayerInterface.h"
 
 //This function should be called affter InitAbilityActorInfo 
@@ -22,6 +25,8 @@ void UFFS_AbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf
 		if (const UFFS_GameplayAbility* AuraAbility = Cast<UFFS_GameplayAbility>(AbilitySpec.Ability))
 		{
 			AbilitySpec.DynamicAbilityTags.AddTag(AuraAbility->StartupInputTag);
+			AbilitySpec.DynamicAbilityTags.AddTag(FFFS_GameplayTags::Get().Ability_State_Owned);
+			
 			GiveAbility(AbilitySpec);
 		}
 	}
@@ -106,6 +111,34 @@ FGameplayTag UFFS_AbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbi
 	return FGameplayTag();
 }
 
+FGameplayTag UFFS_AbilitySystemComponent::GetAbilityStateFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag StatusTag : AbilitySpec.DynamicAbilityTags)
+	{
+		if (StatusTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Ability.State"))))
+		{
+			return StatusTag;
+		}
+	}
+	return FGameplayTag();
+}
+
+FGameplayAbilitySpec* UFFS_AbilitySystemComponent::GetSpecFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+	FScopedAbilityListLock ActiveScopeLoc(*this);
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		for (FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags)
+		{
+			if (Tag.MatchesTag(AbilityTag))
+			{
+				return &AbilitySpec;
+			}
+		}
+	}
+	return nullptr;
+}
+
 void UFFS_AbilitySystemComponent::UpgradeSkill(const FGameplayTag& AttributeTag)
 {
 	if (GetAvatarActor()->Implements<UPlayerInterface>())
@@ -113,6 +146,26 @@ void UFFS_AbilitySystemComponent::UpgradeSkill(const FGameplayTag& AttributeTag)
 		if (IPlayerInterface::Execute_GetSkillPoints(GetAvatarActor()) > 0)
 		{
 			Server_UpgradeSkill(AttributeTag);
+		}
+	}
+}
+
+void UFFS_AbilitySystemComponent::UpdateAbilityState(int32 Level)
+{
+	UAbilitiesInfo* AbilityInfo = UFFS_AbilityBlueprintLibrary::GetAbilityInfo(GetAvatarActor());
+	for (const FFFS_AbilityInfo& Info : AbilityInfo->AbilitiesData)
+	{
+		if (!Info.AbilityTag.IsValid()) continue;
+		if (Level < Info.LevelRequired) continue;
+		
+		if (GetSpecFromAbilityTag(Info.AbilityTag) == nullptr)
+		{
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Info.AbilityClass, 1);
+			AbilitySpec.DynamicAbilityTags.AddTag(FFFS_GameplayTags::Get().Ability_State_Available);
+			GiveAbility(AbilitySpec);
+			MarkAbilitySpecDirty(AbilitySpec);
+
+			ClientUpdateAbilityState(Info.AbilityTag,FFFS_GameplayTags::Get().Ability_State_Available);
 		}
 	}
 }
@@ -125,6 +178,12 @@ void UFFS_AbilitySystemComponent::OnRep_ActivateAbilities()
 		bStartupAbilitiesGranted = true;
 		OnAbilitiesGrantedDelegate.Broadcast();
 	}
+}
+
+void UFFS_AbilitySystemComponent::ClientUpdateAbilityState_Implementation(const FGameplayTag& AbilityTag,
+	const FGameplayTag& StateTag)
+{
+	OnAbilityStateChangedDelegate.Broadcast(AbilityTag, StateTag);
 }
 
 void UFFS_AbilitySystemComponent::Server_UpgradeSkill_Implementation(const FGameplayTag& AttributeTag)

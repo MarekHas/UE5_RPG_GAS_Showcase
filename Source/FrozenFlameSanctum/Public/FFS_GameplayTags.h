@@ -57,9 +57,20 @@ public:
 	FGameplayTag PhysicalDamage;
 
 	FGameplayTag Ability_Attack;
-	
-	FGameplayTag Ability_Fire_FireBolt;
+	FGameplayTag Ability_HitReact;
 
+	FGameplayTag Ability_Fire_FireBolt;
+	FGameplayTag Ability_Lightning_SingleLightning;
+	
+	FGameplayTag Ability_State_Locked;
+	FGameplayTag Ability_State_Available;
+	FGameplayTag Ability_State_Owned;
+	FGameplayTag Ability_State_Used;
+	
+	FGameplayTag Ability_Type_Active;
+	FGameplayTag Ability_Type_Passive;
+	FGameplayTag Ability_Type_None;
+	
 	FGameplayTag Cooldown_Fire_FireBolt;
 	TMap<FGameplayTag, FGameplayTag> DamageTypeToResistanceType;
 protected:

@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "FFS_GameModeBase.generated.h"
 
+class UAbilitiesInfo;
 class UEnemiesData;
 
 /**
@@ -19,4 +20,6 @@ class FROZENFLAMESANCTUM_API AFFS_GameModeBase : public AGameModeBase
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy data")
 	TObjectPtr<UEnemiesData> EnemiesData;
+	UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
+	TObjectPtr<UAbilitiesInfo> AbilityInfo;
 };

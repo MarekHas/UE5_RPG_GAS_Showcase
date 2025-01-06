@@ -104,6 +104,11 @@ void AFFS_HeroCharacter::AddPlayerLevel_Implementation(int32 InPlayerLevel)
 	AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
 	check(FFS_PlayerState);
 	FFS_PlayerState->LevelUp(InPlayerLevel);
+
+	if (UFFS_AbilitySystemComponent* FFS_AbilitySystemComponent = Cast<UFFS_AbilitySystemComponent>(GetAbilitySystemComponent()))
+	{
+		FFS_AbilitySystemComponent->UpdateAbilityState(FFS_PlayerState->GetPlayerLevel());
+	}
 }
 
 void AFFS_HeroCharacter::AddSkillPoints_Implementation(int32 InSkillPoints)

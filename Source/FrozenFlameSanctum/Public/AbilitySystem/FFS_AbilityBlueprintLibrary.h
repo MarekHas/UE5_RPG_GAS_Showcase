@@ -10,6 +10,7 @@
 #include "FFS_AbilityBlueprintLibrary.generated.h"
 
 struct FWidgetControllerParams;
+class UAbilitiesInfo;
 class UFFS_SkillMenuWidgetController;
 class AFFS_GameHUD;
 class UFFS_PlayerStatsWidgetController;
@@ -42,6 +43,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "FFS_AbilityBlueprintLibrary|CharacterClassDefaults")
 	static UEnemiesData* GetCharacterClassInfo(const UObject* WorldContextObject);
+	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|CharacterClassDefaults")
+	static UAbilitiesInfo* GetAbilityInfo(const UObject* WorldContextObject);
+	
 	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
 	static void GetLivePlayersInRange(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors,
 		const TArray<AActor*>& ActorsToIgnore, float Range, const FVector& SphereOrigin);

@@ -30,8 +30,6 @@ struct FNotificationWidgetRow : public FTableRowBase
 
 class UFFS_UserWidget;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerLevelChangedSignature, int32, NewValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatsChangedSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationSignature, FNotificationWidgetRow, Notification);
 
 /**

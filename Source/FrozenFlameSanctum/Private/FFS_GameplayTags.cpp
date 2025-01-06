@@ -171,10 +171,18 @@ void FFFS_GameplayTags::InitializeNativeGameplayTags()
 		FName("Ability.Attack"),
 		FString("Attack Ability Tag")
 		);
-
+	GameplayTags.Ability_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Ability.HitReact"),
+			FString("React to being hit")
+		);
+	
 	GameplayTags.Ability_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Ability.Fire.FireBolt"),
 		FString("FireBolt Ability Tag")
+		);
+	GameplayTags.Ability_Lightning_SingleLightning = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Lightning.SingleLightning"),
+		FString("Single lightning Ability Tag")
 		);
 	
 	GameplayTags.HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
@@ -182,6 +190,36 @@ void FFFS_GameplayTags::InitializeNativeGameplayTags()
 		FString("React to being hit")
 	);
 
+	GameplayTags.Ability_State_Locked = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.State.Locked"),
+		FString("Locked Status, ability is unavailable to research")
+		);
+	GameplayTags.Ability_State_Available = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.State.Available"),
+		FString("Available Status, this ability is available to be researched using skill points")
+		);
+	GameplayTags.Ability_State_Owned = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.State.Owned"),
+		FString("Owned Status, player has this ability and can use")
+		);
+	GameplayTags.Ability_State_Used = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.State.Used"),
+		FString("Used Status, ability is in use")
+		);
+	
+	GameplayTags.Ability_Type_Active = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Type.Active"),
+		FString("Active Type ability")
+		);
+	GameplayTags.Ability_Type_Passive = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Type.Passive"),
+		FString("Type Passive")
+		);
+	GameplayTags.Ability_Type_None = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Type.None"),
+		FString("Type None")
+		);
+	
 	/*
 	* Cooldown
 	*/

@@ -122,13 +122,20 @@ void UFFS_AbilityBlueprintLibrary::GiveStartupAbilities(const UObject* WorldCont
 
 UEnemiesData* UFFS_AbilityBlueprintLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
 {
-	AFFS_GameModeBase* FFS_GameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (FFS_GameMode == nullptr) return nullptr;
-	return FFS_GameMode->EnemiesData;
+	const AFFS_GameModeBase* GameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (GameMode == nullptr) return nullptr;
+	return GameMode->EnemiesData;
+}
+
+UAbilitiesInfo* UFFS_AbilityBlueprintLibrary::GetAbilityInfo(const UObject* WorldContextObject)
+{
+	const AFFS_GameModeBase* GameMode = Cast<AFFS_GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (GameMode == nullptr) return nullptr;
+	return GameMode->AbilityInfo;
 }
 
 void UFFS_AbilityBlueprintLibrary::GetLivePlayersInRange(const UObject* WorldContextObject,
-	TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& ActorsToIgnore, float Range, const FVector& SphereOrigin)
+                                                         TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& ActorsToIgnore, float Range, const FVector& SphereOrigin)
 {
 	FCollisionQueryParams SphereParams;
 	SphereParams.AddIgnoredActors(ActorsToIgnore);

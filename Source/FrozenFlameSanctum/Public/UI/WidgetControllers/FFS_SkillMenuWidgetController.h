@@ -17,4 +17,7 @@ class FROZENFLAMESANCTUM_API UFFS_SkillMenuWidgetController : public UFFS_Widget
 public:
 	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Level")
+	FOnPlayerLevelChangedSignature OnSkillPointsChangedDelegate;
 };
