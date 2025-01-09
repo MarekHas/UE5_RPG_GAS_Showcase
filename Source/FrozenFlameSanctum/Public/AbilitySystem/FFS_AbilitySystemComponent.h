@@ -10,7 +10,8 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEffectAppliedSignature, const FGameplayTagContainer&);
 DECLARE_MULTICAST_DELEGATE(FOnAbilitiesGrantedSignature);
 DECLARE_DELEGATE_OneParam(FOnAbilityGiven, const FGameplayAbilitySpec&);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAbilityStateChangedSignature , const FGameplayTag& /*AbilityTag*/, const FGameplayTag& /*AbilityStateTag*/)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnAbilityStateChangedSignature ,
+	const FGameplayTag& /*AbilityTag*/, const FGameplayTag& /*AbilityStateTag*/, int32 /*AbilityLevel*/)
 /**
  * 
  */
@@ -42,6 +43,9 @@ public:
 	void UpgradeSkill(const FGameplayTag& AttributeTag);
 	UFUNCTION(Server, Reliable)
 	void Server_UpgradeSkill(const FGameplayTag& AttributeTag);
+	UFUNCTION(Server, Reliable)
+	void Server_SpendSkillPoint(const FGameplayTag& AbilityTag);
+	
 	void UpdateAbilityState(int32 Level);
 	bool bStartupAbilitiesGranted = false;
 protected:
@@ -49,5 +53,5 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void Client_OnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 	UFUNCTION(Client, Reliable)
-	void ClientUpdateAbilityState(const FGameplayTag& AbilityTag, const FGameplayTag& StateTag);
+	void ClientUpdateAbilityState(const FGameplayTag& AbilityTag, const FGameplayTag& StateTag, int32 AbilityLevel);
 };

@@ -21,7 +21,7 @@ void UFFS_AttributesWidgetController::BindCallbacksToDependencies()
 	}
 
 
-	GetFFSPlayerState()->OnSkillPointsChangedDelegate.AddLambda(
+	GetFFSPlayerState()->OnAttributePointsChangedDelegate.AddLambda(
 		[this](int32 Points)
 		{
 			SkillPointsChangedDelegate.Broadcast(Points);
@@ -38,7 +38,7 @@ void UFFS_AttributesWidgetController::BroadcastInitialValues()
 		BroadcastAttributeInfo(Pair.Key, Pair.Value());
 	}
 	
-	SkillPointsChangedDelegate.Broadcast(GetFFSPlayerState()->GetSkillPoints());
+	SkillPointsChangedDelegate.Broadcast(GetFFSPlayerState()->GetAttributePoints());
 }
 
 void UFFS_AttributesWidgetController::UpgradeSkill(const FGameplayTag& AttributeTag)

@@ -31,20 +31,20 @@ public:
 	
 	FOnPlayerStateChangedSignature OnPlayerLevelChangedDelegate;
 	FOnPlayerStateChangedSignature OnExperiencePointsChangedDelegate;
+	FOnPlayerStateChangedSignature OnAttributePointsChangedDelegate;
 	FOnPlayerStateChangedSignature OnSkillPointsChangedDelegate;
-	FOnPlayerStateChangedSignature OnSpellPointsChangedDelegate;
 	
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 	FORCEINLINE int32 GetPlayerLevel() const { return PlayerLevel; }
 	FORCEINLINE int32 GetExperiencePoints() const { return ExperiencePoints; }
+	FORCEINLINE int32 GetAttributePoints() const { return AttributePoints; }
 	FORCEINLINE int32 GetSkillPoints() const { return SkillPoints; }
-	FORCEINLINE int32 GetSpellPoints() const { return SpellPoints; }
 	
 	void AddExperiencePoints(const int32 InPoints);
 	void SetExperiencePoints(const int32 InPoints);
+	void AddAttributePoints(int32 InPoints);
 	void AddSkillPoints(int32 InPoints);
-	void AddSpellPoints(int32 InPoints);
 	
 	void LevelUp(const int32 InLevel);
 	void SetLevel(const int32 InLevel);
@@ -61,19 +61,19 @@ private:
 	int32 PlayerLevel = 1;
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_ExperiencePoints)
 	int32 ExperiencePoints = 1;
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_AttributePoints)
+	int32 AttributePoints = 0;
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_SkillPoints)
-	int32 SkillPoints = 1;
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_SpellPoints)
-	int32 SpellPoints = 1;
+	int32 SkillPoints = 0;
 
 	UFUNCTION()
 	void OnRep_Level(int32 OldLevel);
 	UFUNCTION()
 	void OnRep_ExperiencePoints(int32 OldExperiencePoints);
 	UFUNCTION()
-	void OnRep_SkillPoints(int32 OldSkillPoints);
+	void OnRep_AttributePoints(int32 OldAttributePoints);
 	UFUNCTION()
-	void OnRep_SpellPoints(int32 OldSpellPoints);
+	void OnRep_SkillPoints(int32 OldSkillPoints);
 	
 	void SetupAbilitySystemComponent();
 };

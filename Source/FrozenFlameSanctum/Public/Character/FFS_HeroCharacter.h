@@ -32,15 +32,15 @@ public:
 	virtual void AddExperiencePoints_Implementation(int32 InExperiencePoints) override;
 	virtual int32 CheckLevelForGivenExperience_Implementation(int32 InExperiencePoints) const override;
 
+	virtual int32 GetAttributePoints_Implementation() const override;
 	virtual int32 GetSkillPoints_Implementation() const override;
-	virtual int32 GetSpellPoints_Implementation() const override;
 	virtual int32 GetExperiencePoints_Implementation() const override;
+	virtual int32 GetAttributePointsReceived_Implementation(int32 Level) const override;
 	virtual int32 GetSkillPointsReceived_Implementation(int32 Level) const override;
-	virtual int32 GetSpellPointsReceived_Implementation(int32 Level) const override;
 	
 	virtual void AddPlayerLevel_Implementation(int32 InPlayerLevel) override;
+	virtual void AddAttributePoints_Implementation(int32 InAttributePoints) override;
 	virtual void AddSkillPoints_Implementation(int32 InSkillPoints) override;
-	virtual void AddSpellPoints_Implementation(int32 InSpellPoints) override;
 	/** end Player Interface */
 	
 	/** Combat Interface */

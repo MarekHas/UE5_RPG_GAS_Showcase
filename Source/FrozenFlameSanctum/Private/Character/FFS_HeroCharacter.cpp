@@ -64,18 +64,18 @@ int32 AFFS_HeroCharacter::CheckLevelForGivenExperience_Implementation(int32 InEx
 	return FFS_PlayerState->CharacterProgressData->GetCharacterLevel(InExperiencePoints);
 }
 
+int32 AFFS_HeroCharacter::GetAttributePoints_Implementation() const
+{
+	const AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
+	check(FFS_PlayerState);
+	return FFS_PlayerState->GetAttributePoints();
+}
+
 int32 AFFS_HeroCharacter::GetSkillPoints_Implementation() const
 {
 	const AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
 	check(FFS_PlayerState);
 	return FFS_PlayerState->GetSkillPoints();
-}
-
-int32 AFFS_HeroCharacter::GetSpellPoints_Implementation() const
-{
-	const AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
-	check(FFS_PlayerState);
-	return FFS_PlayerState->GetSpellPoints();
 }
 
 int32 AFFS_HeroCharacter::GetExperiencePoints_Implementation() const
@@ -85,18 +85,18 @@ int32 AFFS_HeroCharacter::GetExperiencePoints_Implementation() const
 	return FFS_PlayerState->GetExperiencePoints();
 }
 
+int32 AFFS_HeroCharacter::GetAttributePointsReceived_Implementation(int32 Level) const
+{
+	const AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
+	check(FFS_PlayerState);
+	return FFS_PlayerState->CharacterProgressData->LevelUpData[Level].AttributePointsReceived;
+}
+
 int32 AFFS_HeroCharacter::GetSkillPointsReceived_Implementation(int32 Level) const
 {
 	const AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
 	check(FFS_PlayerState);
 	return FFS_PlayerState->CharacterProgressData->LevelUpData[Level].SkillPointsReceived;
-}
-
-int32 AFFS_HeroCharacter::GetSpellPointsReceived_Implementation(int32 Level) const
-{
-	const AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
-	check(FFS_PlayerState);
-	return FFS_PlayerState->CharacterProgressData->LevelUpData[Level].SpellPointsReceived;
 }
 
 void AFFS_HeroCharacter::AddPlayerLevel_Implementation(int32 InPlayerLevel)
@@ -111,19 +111,19 @@ void AFFS_HeroCharacter::AddPlayerLevel_Implementation(int32 InPlayerLevel)
 	}
 }
 
-void AFFS_HeroCharacter::AddSkillPoints_Implementation(int32 InSkillPoints)
+void AFFS_HeroCharacter::AddAttributePoints_Implementation(int32 InAttributePoints)
 {
 	AFFS_PlayerState* AuraPlayerState = GetPlayerState<AFFS_PlayerState>();
 	check(AuraPlayerState);
-	AuraPlayerState->AddSkillPoints(InSkillPoints);
+	AuraPlayerState->AddAttributePoints(InAttributePoints);
 }
 
-void AFFS_HeroCharacter::AddSpellPoints_Implementation(int32 InSpellPoints)
+void AFFS_HeroCharacter::AddSkillPoints_Implementation(int32 InSkillPoints)
 {
-	AFFS_PlayerState* AuraPlayerState = GetPlayerState<AFFS_PlayerState>();
-	check(AuraPlayerState);
+	AFFS_PlayerState* FFS_PlayerState = GetPlayerState<AFFS_PlayerState>();
+	check(FFS_PlayerState);
 	
-	AuraPlayerState->AddSpellPoints(InSpellPoints);
+	FFS_PlayerState->AddSkillPoints(InSkillPoints);
 }
 
 int32 AFFS_HeroCharacter::GetPlayerLevel_Implementation()

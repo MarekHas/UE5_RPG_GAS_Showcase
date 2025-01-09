@@ -150,6 +150,32 @@ void UFFS_AbilitySystemComponent::UpgradeSkill(const FGameplayTag& AttributeTag)
 	}
 }
 
+void UFFS_AbilitySystemComponent::Server_SpendSkillPoint_Implementation(const FGameplayTag& AbilityTag)
+{
+	if (FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag))
+	{
+		if (GetAvatarActor()->Implements<UPlayerInterface>())
+		{
+			IPlayerInterface::Execute_AddSkillPoints(GetAvatarActor(), -1);
+		}
+		
+		const FFFS_GameplayTags GameplayTags = FFFS_GameplayTags::Get();
+		FGameplayTag Status = GetAbilityStateFromSpec(*AbilitySpec);
+		if (Status.MatchesTagExact(GameplayTags.Ability_State_Available))
+		{
+			AbilitySpec->DynamicAbilityTags.RemoveTag(GameplayTags.Ability_State_Available);
+			AbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.Ability_State_Owned);
+			Status = GameplayTags.Ability_State_Owned;
+		}
+		else if (Status.MatchesTagExact(GameplayTags.Ability_State_Used) || Status.MatchesTagExact(GameplayTags.Ability_State_Owned))
+		{
+			AbilitySpec->Level += 1;
+		}
+		ClientUpdateAbilityState(AbilityTag, Status, AbilitySpec->Level);
+		MarkAbilitySpecDirty(*AbilitySpec);
+	}
+}
+
 void UFFS_AbilitySystemComponent::UpdateAbilityState(int32 Level)
 {
 	UAbilitiesInfo* AbilityInfo = UFFS_AbilityBlueprintLibrary::GetAbilityInfo(GetAvatarActor());
@@ -165,7 +191,7 @@ void UFFS_AbilitySystemComponent::UpdateAbilityState(int32 Level)
 			GiveAbility(AbilitySpec);
 			MarkAbilitySpecDirty(AbilitySpec);
 
-			ClientUpdateAbilityState(Info.AbilityTag,FFFS_GameplayTags::Get().Ability_State_Available);
+			ClientUpdateAbilityState(Info.AbilityTag, FFFS_GameplayTags::Get().Ability_State_Available,1);
 		}
 	}
 }
@@ -181,9 +207,9 @@ void UFFS_AbilitySystemComponent::OnRep_ActivateAbilities()
 }
 
 void UFFS_AbilitySystemComponent::ClientUpdateAbilityState_Implementation(const FGameplayTag& AbilityTag,
-	const FGameplayTag& StateTag)
+	const FGameplayTag& StateTag, int32 AbilityLevel)
 {
-	OnAbilityStateChangedDelegate.Broadcast(AbilityTag, StateTag);
+	OnAbilityStateChangedDelegate.Broadcast(AbilityTag, StateTag, AbilityLevel);
 }
 
 void UFFS_AbilitySystemComponent::Server_UpgradeSkill_Implementation(const FGameplayTag& AttributeTag)

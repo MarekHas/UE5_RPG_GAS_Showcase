@@ -257,12 +257,12 @@ void UFFS_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 			if (NumLevelUps > 0)
 			{
+				const int32 AttributePointsReceived = IPlayerInterface::Execute_GetAttributePointsReceived(EffectProperties.SourceCharacter, CurrentLevel);
 				const int32 SkillPointsReceived = IPlayerInterface::Execute_GetSkillPointsReceived(EffectProperties.SourceCharacter, CurrentLevel);
-				const int32 SpellPointsReceived = IPlayerInterface::Execute_GetSpellPointsReceived(EffectProperties.SourceCharacter, CurrentLevel);
 				
 				IPlayerInterface::Execute_AddPlayerLevel(EffectProperties.SourceCharacter, NumLevelUps);
+				IPlayerInterface::Execute_AddAttributePoints(EffectProperties.SourceCharacter, AttributePointsReceived);
 				IPlayerInterface::Execute_AddSkillPoints(EffectProperties.SourceCharacter, SkillPointsReceived);
-				IPlayerInterface::Execute_AddSpellPoints(EffectProperties.SourceCharacter, SpellPointsReceived);
 
 				bIsNewMaxHealthToSet = true;
 				bIsNewMaxManaToSet = true;

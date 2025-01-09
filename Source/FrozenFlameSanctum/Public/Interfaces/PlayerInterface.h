@@ -29,21 +29,21 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void AddExperiencePoints(int32 InExperiencePoints);
 	UFUNCTION(BlueprintNativeEvent)
-	void AddSkillPoints(int32 InSkillPoints);
+	void AddAttributePoints(int32 InAttributePoints);
 	UFUNCTION(BlueprintNativeEvent)
-	void AddSpellPoints(int32 InSpellPoints);
+	void AddSkillPoints(int32 InSkillPoints);
 
 	UFUNCTION(BlueprintNativeEvent)
-	int32 GetSkillPoints() const;
+	int32 GetAttributePoints() const;
 	UFUNCTION(BlueprintNativeEvent)
-	int32 GetSpellPoints() const;
+	int32 GetSkillPoints() const;
 	UFUNCTION(BlueprintNativeEvent)
 	int32 CheckLevelForGivenExperience(int32 InExperiencePoints) const;
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetExperiencePoints() const;
 	UFUNCTION(BlueprintNativeEvent)
-	int32 GetSkillPointsReceived(int32 Level) const;
+	int32 GetAttributePointsReceived(int32 Level) const;
 	UFUNCTION(BlueprintNativeEvent)
-	int32 GetSpellPointsReceived(int32 Level) const;
+	int32 GetSkillPointsReceived(int32 Level) const;
 
 };

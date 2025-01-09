@@ -15,9 +15,9 @@ struct FLevelUpData
 	int32  ExperiencePointsRequired= 0;
 	//Points received after level up
 	UPROPERTY(EditDefaultsOnly)
-	int32 SkillPointsReceived = 1;
+	int32 AttributePointsReceived = 1;
 	UPROPERTY(EditDefaultsOnly)
-	int32 SpellPointsReceived = 1;
+	int32 SkillPointsReceived = 1;
 };
 /**
  * 
