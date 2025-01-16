@@ -83,6 +83,21 @@ UDamage_ExecutionCalculation::UDamage_ExecutionCalculation()
 
 void UDamage_ExecutionCalculation::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
+	TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCaptureDefs;
+	const FFFS_GameplayTags& Tags = FFFS_GameplayTags::Get();
+		
+	TagsToCaptureDefs.Add(Tags.Attribute_Secondary_Armor, DamageStatsData().ArmorDef);
+	TagsToCaptureDefs.Add(Tags.Attribute_Secondary_BlockChance, DamageStatsData().BlockChanceDef);
+	TagsToCaptureDefs.Add(Tags.Attribute_Secondary_ArmorPenetration, DamageStatsData().ArmorPenetrationDef);
+	TagsToCaptureDefs.Add(Tags.Attribute_Secondary_CriticalHitChance, DamageStatsData().CriticalHitChanceDef);
+	TagsToCaptureDefs.Add(Tags.Attribute_Secondary_CriticalHitResistance, DamageStatsData().CriticalHitResistanceDef);
+	TagsToCaptureDefs.Add(Tags.Attribute_Secondary_CriticalHitDamage, DamageStatsData().CriticalHitDamageDef);
+
+	TagsToCaptureDefs.Add(Tags.Attribute_Resistance_Magic, DamageStatsData().MagicResistanceDef);
+	TagsToCaptureDefs.Add(Tags.Attribute_Resistance_Fire, DamageStatsData().FireResistanceDef);
+	TagsToCaptureDefs.Add(Tags.Attribute_Resistance_Lightning, DamageStatsData().LightningResistanceDef);
+	TagsToCaptureDefs.Add(Tags.Attribute_Resistance_Physical, DamageStatsData().PhysicalResistanceDef);
+	
 	const UAbilitySystemComponent* SourceAbilitySystem = ExecutionParams.GetSourceAbilitySystemComponent();
 	const UAbilitySystemComponent* TargetAbilitySystem = ExecutionParams.GetTargetAbilitySystemComponent();
 	
@@ -114,11 +129,14 @@ void UDamage_ExecutionCalculation::Execute_Implementation(const FGameplayEffectC
 		const FGameplayTag DamageTypeTag = Pair.Key;
 		const FGameplayTag ResistanceTag = Pair.Value;
 		auto T = FDamageStats().GameplayTagToGameplayEffectDefinition;
-		checkf(FDamageStats().GameplayTagToGameplayEffectDefinition.Contains(ResistanceTag), TEXT("GameplayTagToGameplayEffectDefinition doesn't contain Tag: [%s] in ExecCalc_Damage"), *ResistanceTag.ToString());
+		checkf(TagsToCaptureDefs.Contains(ResistanceTag), TEXT("Tags to capture doesn't contain Tag: [%s] in ExecCalc_Damage"), *ResistanceTag.ToString());
 
-		const FGameplayEffectAttributeCaptureDefinition EffectAttributeCaptureDefinition = FDamageStats().GameplayTagToGameplayEffectDefinition[ResistanceTag];
-		float DamageTypeValue = EffectSpec.GetSetByCallerMagnitude(Pair.Key);
-		
+		const FGameplayEffectAttributeCaptureDefinition EffectAttributeCaptureDefinition = TagsToCaptureDefs[ResistanceTag];
+		float DamageTypeValue = EffectSpec.GetSetByCallerMagnitude(Pair.Key, false);
+		if(DamageTypeValue <= 0.f)
+		{
+			continue;
+		}
 		float Resistance = 0.f;
 		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(EffectAttributeCaptureDefinition, EvaluationParameters, Resistance);
 		Resistance = FMath::Clamp(Resistance, 0.f, 100.f);

@@ -16,10 +16,12 @@ UCLASS()
 class FROZENFLAMESANCTUM_API UFFS_ProjectileSpell : public UFFS_DamageGameplayAbility
 {
 	GENERATED_BODY()
-	
+
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	TSubclassOf<AFFS_Projectile> ProjectileClass;
+	UPROPERTY(EditDefaultsOnly)
+	int32 NumProjectiles = 5;
 	
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	UFUNCTION(BlueprintCallable, Category = "Projectile")

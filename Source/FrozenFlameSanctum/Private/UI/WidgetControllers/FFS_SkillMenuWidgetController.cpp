@@ -28,7 +28,10 @@ void UFFS_SkillMenuWidgetController::BindCallbacksToDependencies()
 			bool bEnableSpendPoints = false;
 			bool bEnableEquip = false;
 			ShouldEnableButtons(StateTag, CurrentSkillPoints, bEnableSpendPoints, bEnableEquip);
-			OnSkillButtonSelectedDelegate.Broadcast(bEnableSpendPoints, bEnableEquip);
+			FString Description;
+			FString LevelUpAbilityDescription;
+			GetFFSAbilitySystemComponent()->GetDescriptionsByAbilityTag(AbilityTag, Description, LevelUpAbilityDescription);
+			OnSkillButtonSelectedDelegate.Broadcast(bEnableSpendPoints, bEnableEquip, Description, LevelUpAbilityDescription);
 		}
 		
 		if (AbilitiesInfo)
@@ -38,6 +41,8 @@ void UFFS_SkillMenuWidgetController::BindCallbacksToDependencies()
 			OnAbilityInfoFoundDelegate.Broadcast(Info);
 		}
 	});
+	
+	GetFFSAbilitySystemComponent()->AbilityEquipped.AddUObject(this, &UFFS_SkillMenuWidgetController::OnAbilityEquipped);
 
 	GetFFSPlayerState()->OnAttributePointsChangedDelegate.AddLambda([this](int32 SkillPoints)
 	{
@@ -46,12 +51,28 @@ void UFFS_SkillMenuWidgetController::BindCallbacksToDependencies()
 		bool bEnableSpendPoints = false;
 		bool bEnableEquip = false;
 		ShouldEnableButtons(SelectedSkill.State, CurrentSkillPoints, bEnableSpendPoints, bEnableEquip);
-		OnSkillButtonSelectedDelegate.Broadcast(bEnableSpendPoints, bEnableEquip);
+		FString Description;
+		FString LevelUpAbilityDescription;
+		GetFFSAbilitySystemComponent()->GetDescriptionsByAbilityTag(SelectedSkill.Ability, Description, LevelUpAbilityDescription);
+		OnSkillButtonSelectedDelegate.Broadcast(bEnableSpendPoints, bEnableEquip, Description, LevelUpAbilityDescription);
 	});
+
+	const FGameplayTag SelectedStatus = GetFFSAbilitySystemComponent()->GetStatusFromAbilityTag(SelectedSkill.Ability);
+	if (SelectedStatus.MatchesTagExact(FFFS_GameplayTags::Get().Ability_State_Used))
+	{
+		SelectedSlotTag = GetFFSAbilitySystemComponent()->GetInputTagFromAbilityTag(SelectedSkill.Ability);
+	}
 }
 
 void UFFS_SkillMenuWidgetController::SkillButtonSelected(const FGameplayTag& AbilityTag)
 {
+	if (bWaitingForEquipSelection)
+	{
+		const FGameplayTag SelectedAbilityType = AbilitiesInfo->FindAbilityInfoForTag(AbilityTag).AbilityType;
+		OnEquipEndedDelegate.Broadcast(SelectedAbilityType);
+		bWaitingForEquipSelection = false;
+	}
+	
 	const FFFS_GameplayTags GameplayTags = FFFS_GameplayTags::Get();	
 	const int32 SkillPoints = GetFFSPlayerState()->GetSkillPoints();
 	FGameplayTag AbilityState;	
@@ -75,7 +96,10 @@ void UFFS_SkillMenuWidgetController::SkillButtonSelected(const FGameplayTag& Abi
 	SelectedSkill.Ability = AbilityTag;
 	SelectedSkill.State = AbilityState;
 	
-	OnSkillButtonSelectedDelegate.Broadcast(bEnableSpendPoints, bEnableEquip);
+	FString Description;
+	FString LevelUpAbilityDescription;
+	GetFFSAbilitySystemComponent()->GetDescriptionsByAbilityTag(AbilityTag, Description, LevelUpAbilityDescription);
+	OnSkillButtonSelectedDelegate.Broadcast(bEnableSpendPoints, bEnableEquip, Description, LevelUpAbilityDescription);
 }
 
 void UFFS_SkillMenuWidgetController::SpendPointButtonPressed()
@@ -84,6 +108,68 @@ void UFFS_SkillMenuWidgetController::SpendPointButtonPressed()
 	{
 		GetFFSAbilitySystemComponent()->Server_SpendSkillPoint(SelectedSkill.Ability);
 	}
+}
+
+void UFFS_SkillMenuWidgetController::EquipButtonPressed()
+{
+	const FGameplayTag AbilityType = AbilitiesInfo->FindAbilityInfoForTag(SelectedSkill.Ability).AbilityType;
+	OnEquipStartedDelegate.Broadcast(AbilityType);
+	bWaitingForEquipSelection = true;
+
+	const FGameplayTag AbilityState = GetFFSAbilitySystemComponent()->GetStatusFromAbilityTag(AbilityType);
+	if(AbilityState.MatchesTagExact(FFFS_GameplayTags::Get().Ability_State_Used))
+	{
+		SelectedSlotTag = GetFFSAbilitySystemComponent()->GetInputTagFromAbilityTag(AbilityType);
+	}
+}
+
+void UFFS_SkillMenuWidgetController::DeselectSkill()
+{
+	if (bWaitingForEquipSelection)
+	{
+		const FGameplayTag SelectedAbilityType = AbilitiesInfo->FindAbilityInfoForTag(SelectedSkill.Ability).AbilityType;
+		OnEquipEndedDelegate.Broadcast(SelectedAbilityType);
+		bWaitingForEquipSelection = false;
+	}
+	
+	SelectedSkill.Ability = FFFS_GameplayTags::Get().Ability_Type_None;
+	SelectedSkill.State = FFFS_GameplayTags::Get().Ability_State_Locked;
+	
+	OnSkillButtonSelectedDelegate.Broadcast(false, false, FString(), FString());
+}
+
+void UFFS_SkillMenuWidgetController::SkillPressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType)
+{
+	if (!bWaitingForEquipSelection) return;
+	
+	const FGameplayTag& SelectedAbilityType = AbilitiesInfo->FindAbilityInfoForTag(SelectedSkill.Ability).AbilityType;
+	if (!SelectedAbilityType.MatchesTagExact(AbilityType)) return;
+	GetFFSAbilitySystemComponent()->ServerEquipAbility(SelectedSkill.Ability, SlotTag);
+}
+
+void UFFS_SkillMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& AbilityState,
+	const FGameplayTag& CurrentInputTag, const FGameplayTag& PreviousInputTag)
+{
+	bWaitingForEquipSelection = false;
+	const FFFS_GameplayTags& GameplayTags = FFFS_GameplayTags::Get();
+	
+	FFFS_AbilityInfo PreviousAbilityInfo;
+	PreviousAbilityInfo.StateTag = GameplayTags.Ability_State_Owned;
+	PreviousAbilityInfo.InputTag = PreviousInputTag;
+	PreviousAbilityInfo.AbilityTag = GameplayTags.Ability_Type_None;
+	
+	// when changing input for an ability that already had an assigned one
+	OnAbilityInfoFoundDelegate.Broadcast(PreviousAbilityInfo);
+
+	FFFS_AbilityInfo Info = AbilitiesInfo->FindAbilityInfoForTag(AbilityTag);
+	Info.StateTag = AbilityState;
+	Info.InputTag = CurrentInputTag;
+
+	OnAbilityInfoFoundDelegate.Broadcast(Info);
+	OnSkillReassignedDelegate.Broadcast(AbilityTag);
+	OnEquipEndedDelegate.Broadcast(AbilitiesInfo->FindAbilityInfoForTag(AbilityTag).AbilityType);
+
+	DeselectSkill();
 }
 
 void UFFS_SkillMenuWidgetController::ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SkillPoints,
@@ -97,7 +183,8 @@ void UFFS_SkillMenuWidgetController::ShouldEnableButtons(const FGameplayTag& Abi
 	{
 		bCanSpendSkillPoint = true;
 	}
-	else if (AbilityStatus.MatchesTagExact(GameplayTags.Ability_State_Owned))
+	else if (AbilityStatus.MatchesTagExact(GameplayTags.Ability_State_Owned)
+		|| AbilityStatus.MatchesTagExact(GameplayTags.Ability_State_Used))
 	{
 		bCanEquipWithSkill = true;
 		if(SkillPoints > 0)

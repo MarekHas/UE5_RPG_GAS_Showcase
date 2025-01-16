@@ -2,6 +2,7 @@
 
 #include "UI/WidgetControllers/FFS_PlayerStatsWidgetController.h"
 
+#include "FFS_GameplayTags.h"
 #include "AbilitySystem/FFS_AbilitySystemComponent.h"
 #include "AbilitySystem/FFS_AttributeSet.h"
 #include "AbilitySystem/Data/CharacterProgressData.h"
@@ -36,6 +37,7 @@ void UFFS_PlayerStatsWidgetController::BindCallbacksToDependencies()
 
 	if(GetFFSAbilitySystemComponent())
 	{
+		GetFFSAbilitySystemComponent()->AbilityEquipped.AddUObject(this, &UFFS_PlayerStatsWidgetController::OnAbilityEquipped);
 		if(GetFFSAbilitySystemComponent()->bStartupAbilitiesGranted)
 		{
 			AbilityInfoBroadcast();
@@ -121,4 +123,21 @@ void UFFS_PlayerStatsWidgetController::OnExperiencePointsChanged(int32 NewExperi
 
 		OnExperiencePointsChangedDelegate.Broadcast(PercentOfExperience);
 	}
+}
+
+void UFFS_PlayerStatsWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& AbilityState,
+	const FGameplayTag& CurrentAbilityInputTag, const FGameplayTag& PreviousAbilityInputTag) const
+{
+	const FFFS_GameplayTags& GameplayTags = FFFS_GameplayTags::Get();
+	
+	FFFS_AbilityInfo LastSlotInfo;
+	LastSlotInfo.StateTag = GameplayTags.Ability_State_Available;
+	LastSlotInfo.InputTag = PreviousAbilityInputTag;
+	LastSlotInfo.AbilityTag = GameplayTags.Ability_Type_None;
+	
+	OnAbilityInfoFoundDelegate.Broadcast(LastSlotInfo);
+	FFFS_AbilityInfo Info = AbilitiesInfo->FindAbilityInfoForTag(AbilityTag);
+	Info.StateTag = AbilityState;
+	Info.InputTag = CurrentAbilityInputTag;
+	OnAbilityInfoFoundDelegate.Broadcast(Info);
 }

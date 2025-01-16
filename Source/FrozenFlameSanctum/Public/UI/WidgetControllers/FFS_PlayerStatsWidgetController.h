@@ -70,6 +70,8 @@ protected:
 	TObjectPtr<UDataTable> NotificationWidgetsDataTable;
 	
 	void OnExperiencePointsChanged(int32 NewExperiencePoints);
+	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& AbilityState,
+		const FGameplayTag& CurrentAbilityInputTag, const FGameplayTag& PreviousAbilityInputTag) const;
 
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
