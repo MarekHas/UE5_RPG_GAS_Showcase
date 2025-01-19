@@ -14,6 +14,7 @@ DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnAbilityStateChangedSignature ,
 	const FGameplayTag& /*AbilityTag*/, const FGameplayTag& /*AbilityStateTag*/, int32 /*AbilityLevel*/)
 DECLARE_MULTICAST_DELEGATE_FourParams(FAbilityEquipped, const FGameplayTag& /*AbilityTag*/,
 	const FGameplayTag& /*Ability State*/, const FGameplayTag& /*Current Selected Input*/, const FGameplayTag& /*Previous Input*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeactivatePassiveAbilitySignature, const FGameplayTag& /*AbilityTag*/);
 /**
  * 
  */
@@ -27,6 +28,7 @@ public:
 	FOnAbilitiesGrantedSignature OnAbilitiesGrantedDelegate;
 	FOnAbilityStateChangedSignature  OnAbilityStateChangedDelegate;
 	FAbilityEquipped AbilityEquipped;
+	FOnDeactivatePassiveAbilitySignature OnDeactivatePassiveAbilityDelegate;
 	
 	//This function should be called affter InitAbilityActorInfo 
 	void BindToAbilitySystemDelegates();
@@ -44,6 +46,14 @@ public:
 	FGameplayTag GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag);
 	
 	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag);
+	FGameplayAbilitySpec* GetSpecWithSlot(const FGameplayTag& Slot);
+
+	bool SlotIsEmpty(const FGameplayTag& Slot);
+	static bool AbilityHasSlot(const FGameplayAbilitySpec& Spec, const FGameplayTag& Slot);
+	static bool AbilityHasAnySlot(const FGameplayAbilitySpec& Spec);
+	bool IsPassiveAbility(const FGameplayAbilitySpec& Spec) const;
+	static void AssignSlotToAbility(FGameplayAbilitySpec& Spec, const FGameplayTag& Slot);
+	
 	bool GetDescriptionsByAbilityTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutNextLevelDescription);
 	void UpgradeSkill(const FGameplayTag& AttributeTag);
 	UFUNCTION(Server, Reliable)
@@ -53,13 +63,14 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& Slot);
+	UFUNCTION(Client, Reliable)
 	void ClientEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& State,
 		const FGameplayTag& CurrentInputTag, const FGameplayTag& PreviousInputTag);
 	
 	void UpdateAbilityState(int32 Level);
 	bool bStartupAbilitiesGranted = false;
 
-	void RemoveInputTag(FGameplayAbilitySpec* Spec);
+	static void RemoveInputTag(FGameplayAbilitySpec* Spec);
 	void ClearInputTag(const FGameplayTag& Slot);
 	static bool AbilityHasSlot(FGameplayAbilitySpec* Spec, const FGameplayTag& Slot);
 protected:

@@ -268,6 +268,15 @@ void UFFS_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				bIsNewMaxManaToSet = true;
 
 				IPlayerInterface::Execute_LevelUp(EffectProperties.SourceCharacter);
+
+				
+				int32 AttributePointsReward = 0;
+				int32 SkillPointsReward = 0;
+				for (int32 i = 0; i < NumLevelUps; ++i)
+				{
+					SkillPointsReward += IPlayerInterface::Execute_GetAttributePointsReceived(EffectProperties.SourceCharacter, CurrentLevel + i);
+					AttributePointsReward += IPlayerInterface::Execute_GetSkillPointsReceived(EffectProperties.SourceCharacter, CurrentLevel + i);
+				}
 			}
 			
 			IPlayerInterface::Execute_AddExperiencePoints(EffectProperties.SourceCharacter, 50);

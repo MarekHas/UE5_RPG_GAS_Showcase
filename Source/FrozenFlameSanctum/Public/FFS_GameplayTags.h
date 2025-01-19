@@ -61,7 +61,11 @@ public:
 
 	FGameplayTag Ability_Fire_FireBolt;
 	FGameplayTag Ability_Lightning_SingleLightning;
-	
+
+	FGameplayTag Ability_Passive_ProtectionSphere;
+	FGameplayTag Ability_Passive_LifeRegeneration;
+	FGameplayTag Ability_Passive_ManaRegeneration;
+
 	FGameplayTag Ability_State_Locked;
 	FGameplayTag Ability_State_Available;
 	FGameplayTag Ability_State_Owned;

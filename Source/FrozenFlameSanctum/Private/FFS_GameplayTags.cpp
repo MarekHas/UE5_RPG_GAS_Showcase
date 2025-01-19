@@ -219,6 +219,23 @@ void FFFS_GameplayTags::InitializeNativeGameplayTags()
 		FName("Ability.Type.None"),
 		FString("Type None")
 		);
+
+	/*
+	 * Passive Skills
+	 */
+	
+	GameplayTags.Ability_Passive_ProtectionSphere = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Ability.Passive.ProtectionSphere"),
+			FString("protection sphere")
+			);
+	GameplayTags.Ability_Passive_LifeRegeneration = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Ability.Passive.LifeRegeneration"),
+			FString("life regeneration")
+			);
+	GameplayTags.Ability_Passive_ManaRegeneration = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Ability.Passive.ManaRegeneration"),
+			FString("mana regeneration")
+			);
 	
 	/*
 	* Cooldown
