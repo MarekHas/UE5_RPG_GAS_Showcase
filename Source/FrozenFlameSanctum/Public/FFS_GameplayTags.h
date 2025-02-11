@@ -47,7 +47,8 @@ public:
 	FGameplayTag Input_4;
 	FGameplayTag Input_Passive_1;
 	FGameplayTag Input_Passive_2;
-	
+
+	FGameplayTag Strafing;
 	FGameplayTag HitReact;
 	FGameplayTag Damage;
 	//Damage Types

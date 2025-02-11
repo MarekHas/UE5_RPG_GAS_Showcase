@@ -21,6 +21,12 @@ AFFS_PlayerController::AFFS_PlayerController()
 {
 	bReplicates = true;
 	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
+	PlayerTeamID = FGenericTeamId(0);
+}
+
+FGenericTeamId AFFS_PlayerController::GetGenericTeamId() const
+{
+	return PlayerTeamID;
 }
 
 void AFFS_PlayerController::BeginPlay()

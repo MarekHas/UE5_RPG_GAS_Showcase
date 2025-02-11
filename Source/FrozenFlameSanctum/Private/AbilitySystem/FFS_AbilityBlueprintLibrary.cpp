@@ -3,10 +3,12 @@
 
 #include "AbilitySystem/FFS_AbilityBlueprintLibrary.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/OverlapResult.h"
 
 #include "FFS_AbilityTypes.h"
+#include "AbilitySystem/FFS_AbilitySystemComponent.h"
 #include "Game/FFS_GameModeBase.h"
 #include "Player/FFS_PlayerState.h"
 #include "UI/HUD/FFS_GameHUD.h"
@@ -15,8 +17,47 @@
 #include "AbilitySystem/Data/EnemiesData.h"
 #include "Interfaces/CombatInterface.h"
 
+bool UFFS_AbilityBlueprintLibrary::NativeDoesActorHaveTag(AActor* InActor, FGameplayTag TagToCheck)
+{
+	UFFS_AbilitySystemComponent* FFS_AbilitySystemComponent = NativeGetFFS_AbilitySystemFromActor(InActor);
+
+	return FFS_AbilitySystemComponent->HasMatchingGameplayTag(TagToCheck);
+}
+
+void UFFS_AbilityBlueprintLibrary::BP_DoesActorHaveTag(AActor* InActor, FGameplayTag TagToCheck, bool& OutConfirmType)
+{
+	OutConfirmType = NativeDoesActorHaveTag(InActor,TagToCheck);
+}
+
+UFFS_AbilitySystemComponent* UFFS_AbilityBlueprintLibrary::NativeGetFFS_AbilitySystemFromActor(AActor* InActor)
+{
+	check(InActor);
+
+	return CastChecked<UFFS_AbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InActor));
+}
+
+void UFFS_AbilityBlueprintLibrary::AddGameplayTagToActorIfNone(AActor* InActor, FGameplayTag TagToAdd)
+{
+	UFFS_AbilitySystemComponent* FFS_AbilitySystemComponent = NativeGetFFS_AbilitySystemFromActor(InActor);
+
+	if (!FFS_AbilitySystemComponent->HasMatchingGameplayTag(TagToAdd))
+	{
+		FFS_AbilitySystemComponent->AddLooseGameplayTag(TagToAdd);
+	}
+}
+
+void UFFS_AbilityBlueprintLibrary::RemoveGameplayTagFromActorIfFound(AActor* InActor, FGameplayTag TagToRemove)
+{
+	UFFS_AbilitySystemComponent* FFS_AbilitySystemComponent = NativeGetFFS_AbilitySystemFromActor(InActor);
+
+	if (FFS_AbilitySystemComponent->HasMatchingGameplayTag(TagToRemove))
+	{
+		FFS_AbilitySystemComponent->RemoveLooseGameplayTag(TagToRemove);
+	}
+}
+
 bool UFFS_AbilityBlueprintLibrary::MakeWidgetControllerParams(const UObject* WorldContextObject,
-	FWidgetControllerParams& OutWidgetControllerParams, AFFS_GameHUD*& OutGameHUD)
+                                                              FWidgetControllerParams& OutWidgetControllerParams, AFFS_GameHUD*& OutGameHUD)
 {
 	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
 	{

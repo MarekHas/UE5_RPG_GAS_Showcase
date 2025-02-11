@@ -184,7 +184,12 @@ void FFFS_GameplayTags::InitializeNativeGameplayTags()
 		FName("Ability.Lightning.SingleLightning"),
 		FString("Single lightning Ability Tag")
 		);
-	
+
+	GameplayTags.HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Strafing"),
+		FString("Enemy strafing state")
+	);
+
 	GameplayTags.HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("HitReact"),
 		FString("React to being hit")

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "GameplayTagContainer.h"
+#include "GenericTeamAgentInterface.h"
 
 #include "FFS_PlayerController.generated.h"
 
@@ -21,12 +22,16 @@ class USpatialTextWidgetComponent;
  * 
  */
 UCLASS()
-class FROZENFLAMESANCTUM_API AFFS_PlayerController : public APlayerController
+class FROZENFLAMESANCTUM_API AFFS_PlayerController : public APlayerController, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
 public:
 	AFFS_PlayerController();
+
+	//~ Begin IGenericTeamAgentInterface Interface.
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	//~ End IGenericTeamAgentInterface Interface
 	
 	virtual void PlayerTick(float DeltaTime) override;
 	UFUNCTION(Client, Reliable)
@@ -36,6 +41,7 @@ protected:
 
 	virtual void SetupInputComponent() override;
 private:
+	FGenericTeamId PlayerTeamID;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> PlayerContext;
 	UPROPERTY(EditAnywhere, Category = "Input")

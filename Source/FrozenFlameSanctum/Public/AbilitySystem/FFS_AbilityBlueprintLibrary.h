@@ -11,6 +11,7 @@
 
 struct FWidgetControllerParams;
 class UAbilitiesInfo;
+class UFFS_AbilitySystemComponent;
 class UFFS_SkillMenuWidgetController;
 class AFFS_GameHUD;
 class UFFS_PlayerStatsWidgetController;
@@ -23,15 +24,23 @@ class FROZENFLAMESANCTUM_API UFFS_AbilityBlueprintLibrary : public UBlueprintFun
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	static bool NativeDoesActorHaveTag(AActor* InActor,FGameplayTag TagToCheck);
+	UFUNCTION(BlueprintCallable, Category = "FFS_AbilityBlueprintLibrary|FunctionLibrary", meta = (DisplayName = "Does Actor Have Tag", ExpandEnumAsExecs = "OutConfirmType"))
+	static void BP_DoesActorHaveTag(AActor* InActor,FGameplayTag TagToCheck,bool& OutConfirmType);
+	static UFFS_AbilitySystemComponent* NativeGetFFS_AbilitySystemFromActor(AActor* InActor);
+	UFUNCTION(BlueprintCallable, Category = "FFS_AbilityBlueprintLibrary|FunctionLibrary")
+	static void AddGameplayTagToActorIfNone(AActor* InActor,FGameplayTag TagToAdd);
+	UFUNCTION(BlueprintCallable, Category = "FFS_AbilityBlueprintLibrary|FunctionLibrary")
+	static void RemoveGameplayTagFromActorIfFound(AActor* InActor,FGameplayTag TagToRemove);
+	UFUNCTION(BlueprintPure, Category="FFS_AbilityBlueprintLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static bool MakeWidgetControllerParams(const UObject* WorldContextObject,
 		FWidgetControllerParams& OutWidgetControllerParams,AFFS_GameHUD*& OutGameHUD);
 	
-	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	UFUNCTION(BlueprintPure, Category="FFS_AbilityBlueprintLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static UFFS_PlayerStatsWidgetController* GetWidgetController(const UObject* WorldContextObject);
-	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	UFUNCTION(BlueprintPure, Category="FFS_AbilityBlueprintLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static UFFS_AttributesWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
-	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	UFUNCTION(BlueprintPure, Category="FFS_AbilityBlueprintLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static UFFS_SkillMenuWidgetController* GetSkillMenuWidgetController(const UObject* WorldContextObject);
 	
 	UFUNCTION(BlueprintCallable, Category = "FFS_AbilityBlueprintLibrary|EnemyType")
@@ -43,10 +52,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "FFS_AbilityBlueprintLibrary|CharacterClassDefaults")
 	static UEnemiesData* GetCharacterClassInfo(const UObject* WorldContextObject);
-	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|CharacterClassDefaults")
+	UFUNCTION(BlueprintCallable, Category="FFS_AbilityBlueprintLibrary|CharacterClassDefaults")
 	static UAbilitiesInfo* GetAbilityInfo(const UObject* WorldContextObject);
 	
-	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
+	UFUNCTION(BlueprintCallable, Category = "FFS_AbilityBlueprintLibrary|GameplayMechanics")
 	static void GetLivePlayersInRange(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors,
 		const TArray<AActor*>& ActorsToIgnore, float Range, const FVector& SphereOrigin);
 	
